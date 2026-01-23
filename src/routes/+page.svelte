@@ -84,7 +84,10 @@
 <svelte:head>
 	<title>Felipe Cunha</title>
 	<meta property="og:title" content="Felipe Cunha" />
-	<meta property="og:description" content="Levar Jesus até a poeira da terra." />
+	<meta
+		property="og:description"
+		content="Nossa missão é fazer com que Ele se torne a Pessoa mais amada entre os Povos."
+	/>
 	<meta property="og:image" content={heroBg} />
 	<meta property="og:type" content="website" />
 </svelte:head>
