@@ -2,20 +2,36 @@
 	import { onMount } from 'svelte';
 	import { fly, fade } from 'svelte/transition';
 
+	// Assets
+	import heroBg from '$lib/assets/familia_missionaria.jpg';
+	import aboutImg from '$lib/assets/casal.jpg'; // Using casal for about if user didn't specify one, or empty string logic
+
+	import bookCoverFront from '$lib/assets/cartas_campo.jpeg';
+	import bookCoverBack from '$lib/assets/cartas_felipe.jpeg'; // Assuming this mapping based on names
+	import bookInterior from '$lib/assets/cartas_mão.jpeg';
+
+	import gallery1 from '$lib/assets/casal.jpg';
+	import gallery2 from '$lib/assets/culto.jpg';
+	import gallery3 from '$lib/assets/felipe_pregando.jpg';
+	import gallery4 from '$lib/assets/igreja.jpg';
+
 	let pixFeedback = $state('');
 	let scrollY = $state(0);
 	let innerHeight = $state(0);
 
-	// Mock placeholders for missing images
-	const heroBg = 'https://placehold.co/1920x1080/333333/FFF?text=Hero+Image+Missionary+Field';
-	const aboutImg = 'https://placehold.co/800x1200/F5F5DC/A0522D?text=Portrait:+Felipe+Cunha';
-	const bookMockup = 'https://placehold.co/600x800/A0522D/FFF?text=Book+Cover:+Cartas+do+Campo';
-	const galleryImages = [
-		'https://placehold.co/600x400/556B2F/FFF?text=Mission+Moment+1',
-		'https://placehold.co/600x400/A0522D/FFF?text=Mission+Moment+2',
-		'https://placehold.co/600x400/333333/FFF?text=Mission+Moment+3',
-		'https://placehold.co/600x400/F5F5DC/333333?text=Mission+Moment+4'
-	];
+	// Book Slideshow Images
+	const bookImages = [bookCoverFront, bookCoverBack, bookInterior];
+	let currentBookIndex = $state(0);
+
+	const galleryImages = [gallery1, gallery2, gallery3, gallery4];
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			currentBookIndex = (currentBookIndex + 1) % bookImages.length;
+		}, 3000);
+
+		return () => clearInterval(interval);
+	});
 
 	function copyPix() {
 		const pixKey = '[CHAVE_PIX_AQUI]';
@@ -25,6 +41,13 @@
 				pixFeedback = '';
 			}, 3000);
 		});
+	}
+
+	function scrollToBook() {
+		const bookSection = document.getElementById('livro');
+		if (bookSection) {
+			bookSection.scrollIntoView({ behavior: 'smooth' });
+		}
 	}
 
 	// Intersection Observer Action
@@ -65,18 +88,12 @@
 			<div class="overlay"></div>
 		</div>
 		<div class="hero-content container">
-			<div class="badge" use:reveal>Ministério Felipe Cunha</div>
+			<div class="badge" use:reveal>Felipe Cunha</div>
 			<h1 class="hero-title" use:reveal>
-				Levar <span class="highlight">Jesus</span> até a<br />
-				poeira da terra.
+				"Nossa missão é fazer com que <span class="highlight">Ele</span> se torne a Pessoa mais amada
+				entre os Povos."
 			</h1>
-			<p class="hero-subtitle" use:reveal>
-				Nossa missão é fazer com que Ele se torne a Pessoa mais amada entre os Povos.
-			</p>
-			<div class="scroll-indicator">
-				<span>Explore a missão</span>
-				<div class="line"></div>
-			</div>
+			<button class="scroll-btn" onclick={scrollToBook} use:reveal> Conheça meu livro </button>
 		</div>
 	</header>
 
@@ -106,7 +123,7 @@
 						Como parte do ministério Iris Global, eles plantam bases missionárias e igrejas, levando
 						esperança onde ela é escassa.
 					</p>
-					<div class="signature">Felipe Cunha</div>
+					<div class="signature">Felipe Cunha - O Evangelho nasce na poeira.</div>
 				</div>
 			</div>
 		</div>
@@ -127,7 +144,7 @@
 	</section>
 
 	<!-- Book Spotlight Section -->
-	<section class="section book-spotlight">
+	<section id="livro" class="section book-spotlight">
 		<div class="container grid-layout reverse">
 			<div class="text-col">
 				<span class="eyebrow" use:reveal>Novo Lançamento</span>
@@ -158,7 +175,13 @@
 
 			<div class="image-col" use:reveal>
 				<div class="book-wrapper">
-					<img src={bookMockup} alt="Livro Cartas do Campo" class="book-shadow" />
+					{#each bookImages as img, i}
+						<img
+							src={img}
+							alt="Livro Cartas do Campo"
+							class="book-slide {i === currentBookIndex ? 'active' : ''}"
+						/>
+					{/each}
 				</div>
 			</div>
 		</div>
@@ -167,10 +190,10 @@
 	<!-- Footer -->
 	<footer class="footer">
 		<div class="container">
-			<p>© {new Date().getFullYear()} Ministério Felipe Cunha. Todos os direitos reservados.</p>
+			<p>© {new Date().getFullYear()} Felipe Cunha. Todos os direitos reservados.</p>
 			<div class="socials">
-				<a href="#">Instagram</a>
-				<a href="#">YouTube</a>
+				<a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+				<a href="https://youtube.com" target="_blank" rel="noopener noreferrer">YouTube</a>
 			</div>
 		</div>
 	</footer>
@@ -202,6 +225,8 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		object-position: center 30%; /* Focus on faces (upper center) */
+		filter: grayscale(100%) contrast(1.2) brightness(0.6); /* Force P&B look */
 	}
 
 	.overlay {
@@ -210,7 +235,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+		background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5));
 	}
 
 	.hero-content {
@@ -221,64 +246,51 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 2rem;
+		padding-bottom: 4rem; /* Lift slightly */
 	}
 
 	.badge {
 		text-transform: uppercase;
 		font-family: var(--font-secondary);
 		letter-spacing: 0.2em;
-		font-size: 0.9rem;
+		font-size: 1.2rem; /* Increased size */
 		opacity: 0.9;
 		margin-bottom: -1rem;
 	}
 
 	.hero-title {
 		font-family: var(--font-primary);
-		font-size: var(--text-4xl);
-		line-height: 1.1;
+		font-size: var(--text-3xl); /* Slightly smaller than massive to fit quote */
+		line-height: 1.3;
 		font-weight: 300;
+		max-width: 900px;
+		font-style: italic;
 	}
 
 	.highlight {
-		font-style: italic;
 		font-family: var(--font-accent);
 		color: var(--color-primary-light);
+		font-style: normal;
+		font-size: 1.2em;
 	}
 
-	.hero-subtitle {
-		font-size: var(--text-lg);
-		max-width: 600px;
-		opacity: 0.9;
-		font-weight: 300;
-	}
-
-	.scroll-indicator {
-		position: absolute;
-		bottom: 3rem; /* Fixed: Relative to hero, but pushed down */
-		left: 50%;
-		transform: translateX(-50%);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-		font-size: 0.8rem;
+	.scroll-btn {
+		margin-top: 2rem;
+		background: transparent;
+		color: var(--color-white);
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		padding: 0.8rem 2rem;
+		border-radius: 50px;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
-		opacity: 0.7;
+		font-size: 0.8rem;
+		transition: all 0.3s ease;
 	}
 
-	/* Move scroll indicator differently to not be hidden if content is large */
-	@media (min-height: 600px) {
-		.scroll-indicator {
-			position: absolute;
-			bottom: 40px;
-		}
-	}
-
-	.line {
-		width: 1px;
-		height: 60px;
-		background: var(--color-white);
+	.scroll-btn:hover {
+		background: rgba(255, 255, 255, 0.1);
+		border-color: var(--color-white);
+		transform: translateY(-2px);
 	}
 
 	/* Section Layouts */
@@ -320,8 +332,16 @@
 
 	.section-title {
 		font-size: var(--text-3xl);
-		margin-bottom: var(--spacing-md);
+		margin-bottom: 0.5rem;
 		color: var(--color-primary);
+	}
+
+	.section-subtitle {
+		font-size: var(--text-lg);
+		color: var(--color-text-light);
+		margin-bottom: var(--spacing-md);
+		font-weight: 500;
+		font-family: var(--font-secondary);
 	}
 
 	.italic {
@@ -338,7 +358,7 @@
 
 	.prose p {
 		margin-bottom: 1.5rem;
-		font-size: var(--text-baase);
+		font-size: var(--text-base);
 		color: var(--color-text-light);
 	}
 
@@ -415,17 +435,21 @@
 		justify-content: center;
 		padding: 3rem;
 		background: radial-gradient(circle at center, var(--color-bg-neutral) 0%, transparent 70%);
+		position: relative;
+		height: 500px; /* Fixed height for slideshow */
+		align-items: center;
 	}
 
-	.book-shadow {
+	.book-slide {
 		max-width: 300px;
 		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-		transform: rotate(-5deg);
-		transition: transform 0.5s ease;
+		position: absolute;
+		opacity: 0;
+		transition: opacity 1s ease-in-out;
 	}
 
-	.book-wrapper:hover .book-shadow {
-		transform: rotate(0deg) scale(1.05);
+	.book-slide.active {
+		opacity: 1;
 	}
 
 	.cta-group {
@@ -469,7 +493,7 @@
 	/* Responsive */
 	@media (max-width: 900px) {
 		.hero-title {
-			font-size: 3rem;
+			font-size: 2.5rem;
 		}
 
 		.grid-layout {
@@ -491,10 +515,12 @@
 
 		.book-wrapper {
 			padding: 1rem;
+			height: 400px; /* Adjust for mobile */
 		}
 
-		.book-shadow {
-			max-width: 200px;
+		.book-slide {
+			max-width: 250px; /* Larger on mobile as requested (relative to screen) */
+			width: 70%;
 		}
 	}
 </style>
