@@ -1,0 +1,175 @@
+/* Google Fonts */
+/* Merriweather, Montserrat, Pinyon Script are loaded in app.html */
+
+:root {
+	/* Palette - Refined */
+	--color-primary: #a0522d;
+	/* Terra do Sertão */
+	--color-primary-light: #c27a56;
+	--color-secondary: #556b2f;
+	/* Esperança Viva */
+	--color-bg-neutral: #f5f5dc;
+	/* Areia Clara */
+	--color-bg-light: #fafaf5;
+	/* Lighter sand for contrast */
+	--color-text-main: #333333;
+	/* Grafite Profundo */
+	--color-text-light: #666666;
+	--color-white: #ffffff;
+
+	/* Typography - Fluid Scaling */
+	--font-primary: 'Merriweather', serif;
+	--font-secondary: 'Montserrat', sans-serif;
+	--font-accent: 'Pinyon Script', cursive;
+
+	--text-xs: 0.875rem;
+	--text-sm: 1rem;
+	--text-base: 1.125rem;
+	--text-lg: 1.25rem;
+	--text-xl: 1.5rem;
+	--text-2xl: clamp(1.5rem, 2vw + 1rem, 2.5rem);
+	--text-3xl: clamp(2rem, 3vw + 1rem, 3.5rem);
+	--text-4xl: clamp(2.5rem, 5vw + 1rem, 5rem);
+	/* Hero Title */
+
+	/* Spacing */
+	--spacing-sm: 1rem;
+	--spacing-md: 2rem;
+	--spacing-lg: 4rem;
+	--spacing-xl: 8rem;
+
+	/* Transitions */
+	--transition-slow: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	--transition-medium: 0.3s ease-out;
+}
+
+/* Modern Reset */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	font-family: var(--font-secondary);
+	color: var(--color-text-main);
+	background-color: var(--color-bg-light);
+	line-height: 1.6;
+	overflow-x: hidden;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-primary);
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+	transition: color var(--transition-medium);
+}
+
+button {
+	font-family: var(--font-secondary);
+	border: none;
+	background: none;
+	cursor: pointer;
+}
+
+/* Utilities */
+.container {
+	width: 100%;
+	max-width: 1400px;
+	/* Wider for immersive feel */
+	margin: 0 auto;
+	padding: 0 var(--spacing-md);
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+/* Animation Utilities */
+.reveal {
+	opacity: 0;
+	transform: translateY(30px);
+	transition:
+		opacity 1s ease-out,
+		transform 1s ease-out;
+}
+
+.reveal.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.glass {
+	background: rgba(255, 255, 255, 0.7);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Specific Component Styles (Global Reuse) */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem 2rem;
+	border-radius: 50px;
+	/* Pill shape */
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	transition: all var(--transition-medium);
+	font-size: 0.9rem;
+}
+
+.btn-primary {
+	background-color: var(--color-primary);
+	color: var(--color-white);
+	box-shadow: 0 4px 15px rgba(160, 82, 45, 0.3);
+}
+
+.btn-primary:hover {
+	background-color: var(--color-primary-light);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(160, 82, 45, 0.4);
+}
+
+.btn-secondary {
+	border: 1px solid var(--color-primary);
+	color: var(--color-primary);
+}
+
+.btn-secondary:hover {
+	background-color: var(--color-primary);
+	color: var(--color-white);
+}
+
+/* Text Selection */
+::selection {
+	background: var(--color-primary);
+	color: var(--color-white);
+}
