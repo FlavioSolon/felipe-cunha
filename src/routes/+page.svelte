@@ -18,6 +18,11 @@
 	let pixFeedback = $state('');
 	let scrollY = $state(0);
 	let innerHeight = $state(0);
+	let isExpanded = $state(false);
+
+	function toggleExpand() {
+		isExpanded = !isExpanded;
+	}
 
 	// Book Slideshow Images
 	const bookImages = [bookCoverFront, bookCoverBack, bookInterior];
@@ -134,12 +139,15 @@
 		<div class="container">
 			<h2 class="section-title center">Retalhos do Campo</h2>
 		</div>
-		<div class="gallery-scroll">
-			{#each galleryImages as img}
-				<div class="gallery-item">
-					<img src={img} alt="Momento no campo" />
-				</div>
-			{/each}
+		<div class="marquee-wrapper">
+			<div class="marquee-content">
+				<!-- Duplicate logical functionality for infinite loop -->
+				{#each [...galleryImages, ...galleryImages] as img, i}
+					<div class="gallery-item">
+						<img src={img} alt="Momento {i}" loading="lazy" />
+					</div>
+				{/each}
+			</div>
 		</div>
 	</section>
 
@@ -149,10 +157,34 @@
 			<div class="text-col">
 				<span class="eyebrow" use:reveal>Novo Lançamento</span>
 				<h2 class="section-title" use:reveal>Cartas do Campo</h2>
-				<p class="book-desc" use:reveal>
-					Um compilado de devocionais escritos na poeira da missão. Testemunhos, conselhos e
-					reflexões para quem deseja profundidade em Deus em tempos superficiais.
-				</p>
+				<div class="book-desc-container" use:reveal>
+					<p class="book-desc">
+						Cartas do Campo é uma série de devocionais escritos no campo missionário com o propósito
+						de encorajar e despertar os leitores para um relacionamento profundo com Jesus. Este
+						compilado reúne testemunhos, conselhos, reflexões e orientações para uma vida firmada no
+						Senhor.
+					</p>
+
+					{#if isExpanded}
+						<div class="expanded-content" transition:fade>
+							<p class="book-desc">
+								Jesus é a nossa prioridade. Vivemos dias difíceis e, por isso, precisamos tê-Lo como
+								o fundamento das nossas vidas. Assim, a casa permanecerá de pé mesmo quando os
+								ventos soprarem contra nós.
+							</p>
+							<p class="book-desc">
+								Nossa maior oração é que cada pessoa que ler este pequeno livro seja impulsionada a
+								crescer ainda mais na oração, na leitura da Palavra e no testemunho do evangelho
+								entre os perdidos. Queremos Jesus — e nada mais.
+							</p>
+							<p class="book-desc">Que o seu coração seja aquecido!</p>
+						</div>
+					{/if}
+
+					<button onclick={toggleExpand} class="read-more-btn">
+						{isExpanded ? 'Ler menos' : 'Leia mais'}
+					</button>
+				</div>
 
 				<div class="cta-group" use:reveal>
 					<a
@@ -371,33 +403,31 @@
 
 	/* Gallery */
 	.gallery-section {
-		background-color: var(--color-bg-neutral);
-		padding: var(--spacing-xl) 0;
+		padding: 4rem 0 0;
 		overflow: hidden;
 	}
 
-	.center {
-		text-align: center;
+	.gallery-section .section-title {
+		margin-bottom: 3rem;
 	}
 
-	.gallery-scroll {
-		display: flex;
-		gap: var(--spacing-md);
-		padding: 0 var(--spacing-md);
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scrollbar-width: none; /* Hide scrollbar Firefox */
-		margin-top: var(--spacing-md);
+	.marquee-wrapper {
+		width: 100%;
+		overflow: hidden;
+		white-space: nowrap;
+		padding-bottom: 4rem;
 	}
 
-	.gallery-scroll::-webkit-scrollbar {
-		display: none; /* Hide scrollbar Chrome */
+	.marquee-content {
+		display: inline-flex;
+		animation: scroll 40s linear infinite;
 	}
 
 	.gallery-item {
-		flex: 0 0 400px;
-		height: 300px;
-		scroll-snap-align: center;
+		flex: 0 0 auto;
+		width: 300px;
+		height: 200px;
+		margin-right: 1.5rem;
 		border-radius: 8px;
 		overflow: hidden;
 	}
@@ -406,6 +436,20 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		transition: transform 0.5s ease;
+	}
+
+	.gallery-item:hover img {
+		transform: scale(1.1);
+	}
+
+	@keyframes scroll {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(-50%);
+		}
 	}
 
 	/* Book Section */
@@ -424,28 +468,51 @@
 	}
 
 	.book-desc {
-		font-size: var(--text-base);
-		color: var(--color-text-light);
+		font-size: 1.1rem;
+		line-height: 1.7;
+		margin-bottom: 1rem;
+	}
+
+	.book-desc-container {
 		margin-bottom: 2rem;
-		max-width: 500px;
+	}
+
+	.read-more-btn {
+		background: none;
+		border: none;
+		color: var(--color-primary);
+		font-weight: 600;
+		cursor: pointer;
+		padding: 0;
+		text-decoration: underline;
+		font-size: 1rem;
+		margin-top: 0.5rem;
 	}
 
 	.book-wrapper {
-		display: flex;
-		justify-content: center;
-		padding: 3rem;
-		background: radial-gradient(circle at center, var(--color-bg-neutral) 0%, transparent 70%);
 		position: relative;
-		height: 500px; /* Fixed height for slideshow */
-		align-items: center;
+		width: 100%;
+		max-width: 500px; /* Increased desktop max-width */
+		aspect-ratio: 2 / 3;
+		margin: 0 auto;
+		background: transparent;
+		padding: 0;
+		height: auto;
+		display: block;
 	}
 
 	.book-slide {
-		max-width: 300px;
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 		opacity: 0;
 		transition: opacity 1s ease-in-out;
+		border-radius: 12px;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+		max-width: none;
 	}
 
 	.book-slide.active {
@@ -513,14 +580,15 @@
 			justify-content: center;
 		}
 
+		/* Mobile Book Size Increase */
 		.book-wrapper {
-			padding: 1rem;
-			height: 400px; /* Adjust for mobile */
+			max-width: none;
+			width: 85vw; /* Much larger on mobile */
 		}
 
 		.book-slide {
-			max-width: 250px; /* Larger on mobile as requested (relative to screen) */
-			width: 70%;
+			width: 100%;
+			max-width: none;
 		}
 	}
 </style>
