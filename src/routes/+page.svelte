@@ -3,7 +3,7 @@
 	import { fly, fade } from 'svelte/transition';
 
 	// Assets
-	import heroBg from '$lib/assets/familia_missionaria.jpg';
+	import heroBg from '$lib/assets/familia_missionaria.jpeg';
 	import aboutImg from '$lib/assets/casal.jpg'; // Using casal for about if user didn't specify one, or empty string logic
 
 	import bookCoverFront from '$lib/assets/cartas_campo.jpeg';
@@ -19,9 +19,14 @@
 	let scrollY = $state(0);
 	let innerHeight = $state(0);
 	let isExpanded = $state(false);
+	let isAboutExpanded = $state(false);
 
 	function toggleExpand() {
 		isExpanded = !isExpanded;
+	}
+
+	function toggleAbout() {
+		isAboutExpanded = !isAboutExpanded;
 	}
 
 	// Book Slideshow Images
@@ -39,7 +44,7 @@
 	});
 
 	function copyPix() {
-		const pixKey = '[CHAVE_PIX_AQUI]';
+		const pixKey = '08105478994';
 		navigator.clipboard.writeText(pixKey).then(() => {
 			pixFeedback = 'Chave Pix copiada!';
 			setTimeout(() => {
@@ -123,18 +128,37 @@
 				</h2>
 				<div class="prose" use:reveal>
 					<p class="lead">
-						Felipe Cunha vive o evangelho na prática, servindo no Nordeste brasileiro entre povos
-						não alcançados.
+						Felipe Cunha é pastor e missionário há uma década. Natural de Santa Catarina, é casado
+						com Tamyres Stuart e pai de Noah e Esther.
 					</p>
-					<p>
-						Nascido em Santa Catarina, Felipe trocou o conforto pelo chamado. Há mais de 10 anos,
-						ele, sua esposa Tamyres e seus filhos Noah e Esther, dedicam suas vidas ao cuidado
-						integral de sertanejos, quilombolas e ciganos.
-					</p>
-					<p>
-						Como parte do ministério Iris Global, eles plantam bases missionárias e igrejas, levando
-						esperança onde ela é escassa.
-					</p>
+
+					{#if isAboutExpanded}
+						<div class="expanded-about" transition:fade>
+							<p>
+								Ao longo dos últimos anos, tem servido no Nordeste brasileiro entre povos não
+								alcançados, como sertanejos, quilombolas, ciganos e outras comunidades em situação
+								de vulnerabilidade social e espiritual.
+							</p>
+							<p>
+								Seu chamado está diretamente ligado ao avanço do Evangelho em regiões de difícil
+								acesso e ao cuidado integral de pessoas esquecidas.
+							</p>
+							<p>
+								Felipe atua como plantador de bases missionárias e igrejas, contribuindo para o
+								fortalecimento da igreja local e a formação de líderes.
+							</p>
+							<p>Há 8 anos, serve no ministério Iris Global, juntamente com sua esposa e filhos.</p>
+							<p>
+								Atualmente, a família reside em Mossoró, no estado do Rio Grande do Norte, onde
+								continuam comprometidos com a missão de amar, servir e anunciar o Evangelho.
+							</p>
+						</div>
+					{/if}
+
+					<button onclick={toggleAbout} class="read-more-btn">
+						{isAboutExpanded ? 'Ler menos' : 'Leia mais'}
+					</button>
+
 					<div class="signature">Felipe Cunha - O Evangelho nasce na poeira.</div>
 				</div>
 			</div>
@@ -195,7 +219,7 @@
 
 				<div class="cta-group" use:reveal>
 					<a
-						href="https://wa.me/5500000000000"
+						href="https://wa.me/5547997557857?text=Ol%C3%A1+Felipe,+quero+adquirir+o+livro+%F0%9F%98%80"
 						target="_blank"
 						rel="noopener noreferrer"
 						class="btn btn-primary"
@@ -280,8 +304,8 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		object-position: center 30%; /* Focus on faces (upper center) */
-		filter: grayscale(100%) contrast(1.2) brightness(0.6); /* Force P&B look */
+		object-position: center 80%; /* Focus lower on family */
+		filter: brightness(0.7); /* Slightly darken for text contrast, keep color */
 	}
 
 	.overlay {
