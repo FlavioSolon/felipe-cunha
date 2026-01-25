@@ -54,8 +54,9 @@
 					{isAboutExpanded ? 'Ler menos' : 'Leia mais'}
 				</button>
 
-				<div class="contact-info-bio">
-					<p><strong>Contato / Convites:</strong> felipejcunhaa@gmail.com</p>
+				<div class="contact-wrapper">
+					<span class="contact-label">Convites e Ministrações</span>
+					<a href="mailto:felipejcunhaa@gmail.com" class="contact-link">felipejcunhaa@gmail.com</a>
 				</div>
 
 				<div class="signature">Felipe Cunha - O Evangelho nasce na poeira.</div>
@@ -133,10 +134,37 @@
 		margin-bottom: 1.5rem;
 	}
 
-	.contact-info-bio {
-		margin-bottom: 1rem;
-		font-size: 1rem;
-		color: var(--color-text);
+	.contact-wrapper {
+		margin-top: 1rem;
+		margin-bottom: 2rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+
+	.contact-label {
+		font-family: var(--font-secondary);
+		text-transform: uppercase;
+		font-size: 0.85rem;
+		letter-spacing: 0.1em;
+		color: var(--color-text-light);
+		font-weight: 600;
+	}
+
+	.contact-link {
+		font-size: 1.1rem;
+		color: var(--color-primary);
+		text-decoration: none;
+		font-weight: 500;
+		border-bottom: 1px solid var(--color-primary-light);
+		transition: all 0.3s ease;
+		width: fit-content;
+		padding-bottom: 2px;
+	}
+
+	.contact-link:hover {
+		color: var(--color-secondary);
+		border-color: var(--color-secondary);
 	}
 
 	.signature {
