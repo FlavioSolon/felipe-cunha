@@ -6,6 +6,8 @@
 	import BookSpotlight from '$lib/components/BookSpotlight.svelte';
 	import Gallery from '$lib/components/Gallery.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Divider from '$lib/components/Divider.svelte';
+	import { reveal } from '$lib/actions/reveal';
 
 	let scrollY = $state(0);
 	let innerHeight = $state(0);
@@ -26,8 +28,26 @@
 
 <main>
 	<Hero {scrollY} />
+
 	<About />
+
+	<div class="subtle-separator" use:reveal></div>
+
 	<Gallery />
+
+	<Divider />
+
 	<BookSpotlight />
+
 	<Footer />
 </main>
+
+<style>
+	.subtle-separator {
+		width: 60%;
+		height: 1px;
+		background-color: var(--color-primary-light);
+		opacity: 0.3;
+		margin: 2rem auto;
+	}
+</style>
