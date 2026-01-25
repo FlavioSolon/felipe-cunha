@@ -1,5 +1,5 @@
 <script lang="ts">
-	import aboutImg from '$lib/assets/casal.jpg';
+	import aboutImg from '$lib/assets/felipe.jpeg';
 	import { reveal } from '$lib/actions/reveal';
 	import { fade } from 'svelte/transition';
 
@@ -18,9 +18,12 @@
 			</div>
 		</div>
 		<div class="text-col">
-			<h2 class="section-title" use:reveal>
-				Uma vida dedicada<br />ao <span class="italic">Ide</span>.
-			</h2>
+			<div class="quote-wrapper" use:reveal>
+				<h2 class="impact-quote">
+					“Somos chamados a nos concentrar no rosto de <span class="highlight">Jesus</span> e encontrá-Lo
+					no rosto daquele que está à nossa frente.”
+				</h2>
+			</div>
 			<div class="prose" use:reveal>
 				<p class="lead">
 					Felipe Cunha é pastor e missionário há uma década. Natural de Santa Catarina, é casado com

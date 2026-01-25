@@ -7,6 +7,7 @@
 	import Gallery from '$lib/components/Gallery.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Divider from '$lib/components/Divider.svelte';
+	import FloatingSocials from '$lib/components/FloatingSocials.svelte';
 	import { reveal } from '$lib/actions/reveal';
 
 	let scrollY = $state(0);
@@ -27,6 +28,7 @@
 </svelte:head>
 
 <main>
+	<FloatingSocials />
 	<Hero {scrollY} />
 
 	<About />

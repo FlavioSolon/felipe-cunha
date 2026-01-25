@@ -10,7 +10,7 @@
 
 <section class="section gallery-section" use:reveal>
 	<div class="container">
-		<h2 class="section-title center">Retalhos do Campo</h2>
+		<h2 class="section-title center">Reflexões do campo</h2>
 	</div>
 	<div class="marquee-wrapper">
 		<div class="marquee-content">
