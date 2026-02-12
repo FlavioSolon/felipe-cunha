@@ -1,0 +1,414 @@
+<script lang="ts">
+	import type { FeedPost } from '$lib/data/feed';
+	import { fade } from 'svelte/transition';
+
+	export let item: FeedPost;
+	export let onReadMore: (item: FeedPost) => void;
+
+	let currentImageIndex = 0;
+	let liked = false;
+	let shareText = 'Compartilhar';
+
+	function nextImage() {
+		if (currentImageIndex < item.images.length - 1) {
+			currentImageIndex++;
+		}
+	}
+
+	function prevImage() {
+		if (currentImageIndex > 0) {
+			currentImageIndex--;
+		}
+	}
+
+	function toggleLike() {
+		liked = !liked;
+		// In a real app, this would update the backend
+	}
+
+	async function share() {
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					title: item.title,
+					text: item.content.substring(0, 100) + '...',
+					url: window.location.href // Or specific post URL if routing allowed
+				});
+			} catch (err) {
+				console.log('Error sharing:', err);
+			}
+		} else {
+			// Fallback for desktop/unsupported browsers
+			navigator.clipboard.writeText(window.location.href);
+			shareText = 'Link Copiado!';
+			setTimeout(() => (shareText = 'Compartilhar'), 2000);
+		}
+	}
+</script>
+
+<div class="feed-item">
+	<!-- Background Image Carousel -->
+	<div class="image-container">
+		{#each item.images as image, index}
+			<div
+				class="image-slide"
+				class:active={index === currentImageIndex}
+				style="background-image: url('{image}');"
+			></div>
+		{/each}
+
+		<!-- Gradient Overlay -->
+		<div class="gradient-overlay"></div>
+
+		<!-- Navigation/Indicators -->
+		{#if item.images.length > 1}
+			<div class="carousel-indicators">
+				{#each item.images as _, index}
+					<button
+						class="indicator"
+						class:active={index === currentImageIndex}
+						on:click|stopPropagation={() => (currentImageIndex = index)}
+						aria-label="Go to image {index + 1}"
+					></button>
+				{/each}
+			</div>
+
+			<!-- Touch areas for navigation could be added here, 
+                 but simple click on sides usually requires more logic. 
+                 For now, let's keep it simple or use swipe libraries later. 
+                 Since user asked for 'horizontal image carousels', adding simple side buttons if multiple images.
+            -->
+			<button
+				class="nav-btn prev"
+				on:click|stopPropagation={prevImage}
+				class:hidden={currentImageIndex === 0}
+				aria-label="Previous image"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke="currentColor"
+					class="w-6 h-6"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+				</svg>
+			</button>
+			<button
+				class="nav-btn next"
+				on:click|stopPropagation={nextImage}
+				class:hidden={currentImageIndex === item.images.length - 1}
+				aria-label="Next image"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke="currentColor"
+					class="w-6 h-6"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+				</svg>
+			</button>
+		{/if}
+	</div>
+
+	<!-- Content Overlay -->
+	<div class="content-overlay">
+		<h2 class="title">{item.title}</h2>
+		<p class="preview-text">
+			{item.content.slice(0, 120)}...
+		</p>
+
+		<div class="actions">
+			<button class="read-more-btn" on:click={() => onReadMore(item)}>
+				Ler tudo
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke="currentColor"
+					class="w-5 h-5 ml-2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+					/>
+				</svg>
+			</button>
+
+			<div class="social-actions">
+				<button class="icon-btn like-btn" class:liked on:click={toggleLike} aria-label="Like">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill={liked ? 'currentColor' : 'none'}
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="w-8 h-8"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+						/>
+					</svg>
+					<span class="count">{item.likes + (liked ? 1 : 0)}</span>
+				</button>
+
+				<button class="icon-btn share-btn" on:click={share} aria-label="Share">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="w-8 h-8"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.287.696.287 1.093s-.107.77-.287 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+						/>
+					</svg>
+					<span class="label">{shareText}</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.feed-item {
+		height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
+		width: 100%;
+		position: relative;
+		overflow: hidden;
+		scroll-snap-align: start;
+		background-color: #1a1a1a; /* Fallback */
+	}
+
+	.image-container {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+
+	.image-slide {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-size: cover;
+		background-position: center;
+		opacity: 0;
+		transition: opacity 0.5s ease-in-out;
+	}
+
+	.image-slide.active {
+		opacity: 1;
+	}
+
+	.gradient-overlay {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 60%;
+		background: linear-gradient(
+			to top,
+			rgba(0, 0, 0, 0.9) 0%,
+			rgba(0, 0, 0, 0.5) 50%,
+			rgba(0, 0, 0, 0) 100%
+		);
+		pointer-events: none;
+	}
+
+	.content-overlay {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		padding: 2rem 1.5rem 5rem 1.5rem; /* Bottom padding for nav bar safe area */
+		color: white;
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.title {
+		font-family: 'Merriweather', serif;
+		font-size: 2rem;
+		margin: 0;
+		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+		line-height: 1.2;
+	}
+
+	.preview-text {
+		font-family: 'Montserrat', sans-serif;
+		font-size: 1rem;
+		margin: 0.5rem 0 1.5rem 0;
+		opacity: 0.9;
+		text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+		max-width: 90%;
+		line-height: 1.5;
+	}
+
+	.actions {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.read-more-btn {
+		background: rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(5px);
+		border: 1px solid rgba(255, 255, 255, 0.4);
+		color: white;
+		padding: 0.8rem 1.5rem;
+		border-radius: 50px;
+		font-family: 'Montserrat', sans-serif;
+		font-weight: 600;
+		font-size: 1rem;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		width: fit-content;
+		transition: all 0.3s ease;
+	}
+
+	.read-more-btn:hover {
+		background: rgba(255, 255, 255, 0.3);
+		transform: translateY(-2px);
+	}
+
+	.social-actions {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.icon-btn {
+		background: none;
+		border: none;
+		color: white;
+		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.2rem;
+		padding: 0;
+		transition: transform 0.2s;
+	}
+
+	.icon-btn:hover {
+		transform: scale(1.1);
+	}
+
+	.icon-btn:active {
+		transform: scale(0.9);
+	}
+
+	.like-btn.liked {
+		color: #ff4d4d;
+	}
+
+	.like-btn.liked svg {
+		fill: #ff4d4d;
+	}
+
+	.count,
+	.label {
+		font-size: 0.75rem;
+		font-family: 'Montserrat', sans-serif;
+		opacity: 0.9;
+	}
+
+	.label {
+		white-space: nowrap;
+	}
+
+	/* Carousel Indicators */
+	.carousel-indicators {
+		position: absolute;
+		top: 2rem;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		gap: 0.5rem;
+		z-index: 20;
+	}
+
+	.indicator {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.3);
+		border: none;
+		padding: 0;
+		transition: all 0.3s;
+	}
+
+	.indicator.active {
+		background: white;
+		transform: scale(1.2);
+	}
+
+	.nav-btn {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		background: rgba(0, 0, 0, 0.2);
+		color: white;
+		border: none;
+		border-radius: 50%;
+		padding: 0.5rem;
+		cursor: pointer;
+		z-index: 20;
+		backdrop-filter: blur(2px);
+	}
+
+	.nav-btn.prev {
+		left: 1rem;
+	}
+	.nav-btn.next {
+		right: 1rem;
+	}
+
+	.nav-btn.hidden {
+		display: none;
+	}
+
+	@media (min-width: 768px) {
+		.title {
+			font-size: 3rem;
+		}
+		.preview-text {
+			font-size: 1.2rem;
+			max-width: 600px;
+		}
+		.feed-item {
+			/* Consider max-width for desktop if we want a mobile-like feel, 
+                or full width. For now full width to resemble typical immersive scroll sites. */
+		}
+		.content-overlay {
+			padding-bottom: 3rem;
+		}
+		.actions {
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: flex-end;
+		}
+		.read-more-btn {
+			font-size: 1.1rem;
+		}
+	}
+</style>
