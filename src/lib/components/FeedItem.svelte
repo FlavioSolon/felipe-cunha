@@ -175,7 +175,7 @@
 							d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.287.696.287 1.093s-.107.77-.287 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
 						/>
 					</svg>
-					<span class="label">{shareText}</span>
+					<!-- Removed text label for cleaner share button -->
 				</button>
 			</div>
 		</div>
@@ -183,6 +183,36 @@
 </div>
 
 <style>
+	/* ... (unchanged styles) */
+
+	/* Custom overrides specifically for buttons to fine-tune sizes */
+	.like-btn svg {
+		width: 40px !important; /* Larger like button */
+		height: 40px !important;
+	}
+
+	.share-btn svg {
+		width: 24px !important; /* Smaller share button */
+		height: 24px !important;
+	}
+
+	.nav-btn {
+		/* Make nav buttons cleaner */
+		background: transparent !important; /* Remove background */
+		backdrop-filter: none !important;
+		opacity: 0.7;
+	}
+
+	.nav-btn:hover {
+		opacity: 1;
+		transform: scale(1.2);
+	}
+
+	.nav-btn svg {
+		width: 32px;
+		height: 32px;
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+	}
 	.feed-item {
 		height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
 		width: 100%;
@@ -255,7 +285,7 @@
 	.preview-text {
 		font-family: 'Montserrat', sans-serif;
 		font-size: 1rem;
-		margin: 0.5rem 0 1.5rem 0;
+		margin: 0.5rem 0 1rem 0;
 		opacity: 0.9;
 		text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 		max-width: 90%;
@@ -269,15 +299,15 @@
 	}
 
 	.read-more-btn {
-		background: rgba(255, 255, 255, 0.2);
-		backdrop-filter: blur(5px);
-		border: 1px solid rgba(255, 255, 255, 0.4);
+		background: transparent;
+		/* backdrop-filter: blur(5px); Removed blur for cleaner look */
+		border: 1px solid rgba(255, 255, 255, 0.6);
 		color: white;
-		padding: 0.8rem 1.5rem;
+		padding: 0.5rem 1rem; /* Smaller padding */
 		border-radius: 50px;
 		font-family: 'Montserrat', sans-serif;
-		font-weight: 600;
-		font-size: 1rem;
+		font-weight: 500; /* Lighter weight */
+		font-size: 0.9rem; /* Smaller font */
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -325,21 +355,16 @@
 		fill: #ff4d4d;
 	}
 
-	.count,
-	.label {
+	.count {
 		font-size: 0.75rem;
 		font-family: 'Montserrat', sans-serif;
 		opacity: 0.9;
 	}
 
-	.label {
-		white-space: nowrap;
-	}
-
 	/* Carousel Indicators */
 	.carousel-indicators {
 		position: absolute;
-		top: 2rem;
+		top: 6rem; /* Moved down to avoid header overlap */
 		left: 50%;
 		transform: translateX(-50%);
 		display: flex;

@@ -126,7 +126,7 @@ export const conselhos: FeedPost[] = [
         
         Seja fiel no pouco, e sobre o muito você será colocado. Valorize cada passo, cada conquista, cada aprendizado.`,
         images: [
-            '/placeholders/semente.jpg',
+            '$lib/assets/menino.jpeg',
             '/placeholders/mao.jpg'
         ],
         date: '2023-10-18',
