@@ -127,6 +127,8 @@
 			message = 'Salvando no banco de dados...';
 
 			// 2. Insert or Update DB
+			let postTitle = title || 'Nova Publicação';
+
 			if (editingId) {
 				const { error: dbError } = await supabase
 					.from('posts')
@@ -146,6 +148,22 @@
 					images: finalImages
 				});
 				if (dbError) throw dbError;
+
+				// Trigger Push Notification for NEW posts only
+				try {
+					fetch('/api/notify', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							title: postTitle,
+							body: description ? description.substring(0, 100) : 'Confira o novo conteúdo!',
+							url: `/${type === 'conselho' ? 'conselhos' : 'reflexoes'}` // Deep link logic could be improved
+							// Ideally finding the specific post ID, but for now linking to feed is okay
+						})
+					});
+				} catch (notifyErr) {
+					console.error('Notification trigger failed', notifyErr);
+				}
 			}
 
 			message = 'Sucesso!';

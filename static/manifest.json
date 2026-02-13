@@ -1,0 +1,21 @@
+{
+    "name": "Felipe Cunha",
+    "short_name": "Felipe Cunha",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1a1a1a",
+    "theme_color": "#aa6c39",
+    "icons": [
+        {
+            "src": "pwa-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "pwa-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "description": "Reflexões e Conselhos do Campo"
+}

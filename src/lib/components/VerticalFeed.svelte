@@ -4,6 +4,8 @@
 	import type { FeedPost } from '$lib/data/feed';
 	import { onMount } from 'svelte';
 
+	import { subscribeUser } from '$lib/push';
+
 	export let items: FeedPost[] = [];
 	export let title = 'Feed';
 
@@ -17,7 +19,6 @@
 
 	function closeSheet() {
 		isSheetOpen = false;
-		// Small delay to clear selected item after animation could be nice, but not strictly necessary
 	}
 
 	function surpriseMe() {
@@ -26,6 +27,17 @@
 		const element = document.getElementById(`post-${items[randomIndex].id}`);
 		if (element) {
 			element.scrollIntoView({ behavior: 'smooth' });
+		}
+	}
+
+	async function handleSubscribe() {
+		const granted = await Notification.requestPermission();
+		if (granted === 'granted') {
+			const success = await subscribeUser();
+			if (success) alert('Notificações ativadas! Você receberá novidades em breve.');
+			else alert('Erro ao ativar notificações.');
+		} else {
+			alert('Permissão de notificação negada.');
 		}
 	}
 </script>
@@ -50,22 +62,41 @@
 			</svg>
 		</a>
 		<h1 class="feed-title">{title}</h1>
-		<button class="surprise-btn" on:click={surpriseMe} aria-label="Surpreenda-me">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				stroke="currentColor"
-				class="w-6 h-6"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-				/>
-			</svg>
-		</button>
+
+		<div class="header-actions">
+			<button class="icon-btn-header" on:click={handleSubscribe} aria-label="Ativar Notificações">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke="currentColor"
+					class="w-6 h-6"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+					/>
+				</svg>
+			</button>
+			<button class="icon-btn-header" on:click={surpriseMe} aria-label="Surpreenda-me">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke="currentColor"
+					class="w-6 h-6"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+					/>
+				</svg>
+			</button>
+		</div>
 	</header>
 
 	<main class="feed-scroller">
@@ -121,8 +152,13 @@
 		letter-spacing: 0.5px;
 	}
 
+	.header-actions {
+		display: flex;
+		gap: 0.8rem;
+	}
+
 	.back-link,
-	.surprise-btn {
+	.icon-btn-header {
 		color: white;
 		background: rgba(255, 255, 255, 0.15);
 		backdrop-filter: blur(8px);
@@ -141,14 +177,14 @@
 	}
 
 	.back-link:hover,
-	.surprise-btn:hover {
+	.icon-btn-header:hover {
 		background: rgba(255, 255, 255, 0.25);
 		transform: scale(1.05);
 		border-color: rgba(255, 255, 255, 0.4);
 	}
 
 	.back-link:active,
-	.surprise-btn:active {
+	.icon-btn-header:active {
 		transform: scale(0.95);
 	}
 
