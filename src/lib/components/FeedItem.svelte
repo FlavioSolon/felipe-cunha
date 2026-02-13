@@ -192,10 +192,19 @@
 	}
 
 	.cacto-icon {
-		width: 104px; /* Increased size significantly as requested */
+		width: 104px;
 		height: 104px;
 		transition: transform 0.2s;
 		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+		object-fit: contain; /* Ensure aspect ratio */
+	}
+
+	/* 
+       The fire animation image likely has padding for the flames, making the cactus part smaller.
+       We scale it up slightly to visually match the non-fire cactus size.
+    */
+	.icon-btn.liked .cacto-icon {
+		transform: scale(1.3); /* Scale up the liked icon to match visual size */
 	}
 
 	.liked-anim {
@@ -212,7 +221,7 @@
 			filter: brightness(1.2) drop-shadow(0 0 10px orange);
 		}
 		100% {
-			transform: scale(1);
+			transform: scale(1.3); /* Keep it scaled up at the end state */
 			filter: brightness(1);
 		}
 	}
@@ -457,7 +466,7 @@
 		.actions {
 			flex-direction: row;
 			justify-content: space-between;
-			align-items: flex-end;
+			align-items: center; /* Enforce center alignment on desktop too */
 		}
 		.read-more-btn {
 			font-size: 1.1rem;
