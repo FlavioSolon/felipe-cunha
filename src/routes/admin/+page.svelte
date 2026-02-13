@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { supabase, s3 } from '$lib/supabaseClient';
 	import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
-	import { fade, slide } from 'svelte/transition';
+	import { fade, slide, fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
+	import { toasts } from '$lib/stores/toastStore';
 	const flipDurationMs = 200;
 
 	let password = '';
 	let authenticated = false;
-	let loading = true; // For checking session on mount
+	let loading = true;
 
 	// Form State
 	let type = 'reflexao';
@@ -18,10 +20,40 @@
 	let uploading = false;
 	let message = '';
 
-	// Data
+	// Data & Filtering
+	let allPosts: any[] = [];
 	let posts: any[] = [];
 	let editingId: string | null = null;
 	let currentImages: string[] = [];
+
+	// Filters & Pagination
+	let filterType: 'all' | 'reflexao' | 'conselho' = 'all';
+	let sortOrder: 'newest' | 'oldest' = 'newest';
+	let currentPage = 1;
+	let postsPerPage = 12;
+
+	$: totalPages = Math.ceil(posts.length / postsPerPage);
+	$: paginatedPosts = posts.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
+
+	// Apply filters whenever they change
+	$: {
+		let filtered = [...allPosts];
+
+		// Filter by type
+		if (filterType !== 'all') {
+			filtered = filtered.filter((p) => p.type === filterType);
+		}
+
+		// Sort
+		filtered.sort((a, b) => {
+			const dateA = new Date(a.created_at).getTime();
+			const dateB = new Date(b.created_at).getTime();
+			return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+		});
+
+		posts = filtered;
+		currentPage = 1; // Reset to first page when filters change
+	}
 
 	onMount(() => {
 		const sessionAuth = sessionStorage.getItem('admin_auth');
@@ -38,7 +70,7 @@
 			sessionStorage.setItem('admin_auth', 'true');
 			fetchPosts();
 		} else {
-			alert('Senha incorreta!');
+			toasts.error('Senha incorreta!');
 		}
 	}
 
@@ -46,6 +78,7 @@
 		authenticated = false;
 		sessionStorage.removeItem('admin_auth');
 		password = '';
+		allPosts = [];
 		posts = [];
 	}
 
@@ -175,12 +208,12 @@
 				console.error('Notification trigger failed', notifyErr);
 			}
 
-			message = 'Sucesso!';
+			toasts.success(editingId ? 'Post atualizado com sucesso!' : 'Post publicado com sucesso!');
 			cancelEdit();
 			fetchPosts();
 		} catch (err: any) {
 			console.error(err);
-			message = 'Erro: ' + (err.message || JSON.stringify(err));
+			toasts.error('Erro: ' + (err.message || 'Falha ao processar'));
 		} finally {
 			uploading = false;
 		}
@@ -191,18 +224,28 @@
 			.from('posts')
 			.select('*')
 			.order('created_at', { ascending: false });
-		if (data) posts = data;
+		if (data) {
+			allPosts = data;
+		}
 	}
 
-	async function deletePost(post: any) {
-		if (!confirm('Tem certeza que deseja excluir este post permanentemente?')) return;
+	let postToDelete: any = null;
+	let showDeleteModal = false;
+
+	function confirmDelete(post: any) {
+		postToDelete = post;
+		showDeleteModal = true;
+	}
+
+	async function deletePost() {
+		if (!postToDelete) return;
 
 		// 1. Delete images from Storage
-		const imagesToDelete = post.images || (post.image_url ? [post.image_url] : []);
+		const imagesToDelete =
+			postToDelete.images || (postToDelete.image_url ? [postToDelete.image_url] : []);
 
 		for (const url of imagesToDelete) {
 			try {
-				// Assumes standard Supabase URL structure, key is the last part
 				const key = url.split('/').pop();
 				if (key) {
 					console.log('Deleting from S3:', key);
@@ -210,15 +253,20 @@
 				}
 			} catch (err) {
 				console.error('Error deleting image from S3:', err);
-				// Continue to delete DB record even if image delete fails?
-				// Usually yes, to avoid phantom records.
 			}
 		}
 
 		// 2. Delete from DB
-		const { error } = await supabase.from('posts').delete().eq('id', post.id);
-		if (!error) fetchPosts();
-		else alert('Erro ao excluir do banco de dados');
+		const { error } = await supabase.from('posts').delete().eq('id', postToDelete.id);
+		if (!error) {
+			toasts.success('Post excluído com sucesso!');
+			fetchPosts();
+		} else {
+			toasts.error('Erro ao excluir post');
+		}
+
+		showDeleteModal = false;
+		postToDelete = null;
 	}
 
 	function startEdit(post: any) {
@@ -388,44 +436,154 @@
 
 			<!-- List Section -->
 			<section class="list-section">
-				<h3>Conteúdo Recente</h3>
-				<div class="posts-grid">
-					{#each posts as post (post.id)}
-						<article class="post-card glass" transition:fade>
-							<div class="post-image">
-								<img src={post.images?.[0] || post.image_url} alt={post.title} loading="lazy" />
-								<div class="post-type-badge {post.type}">{post.type}</div>
-							</div>
-							<div class="post-content">
-								<h4>{post.title || 'Sem título'}</h4>
-								<p class="post-date">
-									{new Date(post.created_at).toLocaleDateString('pt-BR', {
-										day: '2-digit',
-										month: 'long',
-										year: 'numeric'
-									})}
-								</p>
+				<div class="list-header">
+					<h3>Conteúdo Recente</h3>
 
-								<div class="post-actions">
-									<button class="action-btn edit" on:click={() => startEdit(post)} title="Editar">
-										✏️
-									</button>
-									<button
-										class="action-btn delete"
-										on:click={() => deletePost(post)}
-										title="Excluir"
-									>
-										🗑️
-									</button>
-								</div>
+					<div class="filters">
+						<div class="filter-group">
+							<label class="filter-label">Tipo:</label>
+							<div class="pill-buttons">
+								<button
+									class="pill-btn"
+									class:active={filterType === 'all'}
+									on:click={() => (filterType = 'all')}
+								>
+									Todos
+								</button>
+								<button
+									class="pill-btn"
+									class:active={filterType === 'reflexao'}
+									on:click={() => (filterType = 'reflexao')}
+								>
+									Reflexões
+								</button>
+								<button
+									class="pill-btn"
+									class:active={filterType === 'conselho'}
+									on:click={() => (filterType = 'conselho')}
+								>
+									Conselhos
+								</button>
 							</div>
-						</article>
-					{/each}
+						</div>
+
+						<div class="filter-group">
+							<label class="filter-label">Ordenar:</label>
+							<div class="pill-buttons">
+								<button
+									class="pill-btn"
+									class:active={sortOrder === 'newest'}
+									on:click={() => (sortOrder = 'newest')}
+								>
+									Mais Recentes
+								</button>
+								<button
+									class="pill-btn"
+									class:active={sortOrder === 'oldest'}
+									on:click={() => (sortOrder = 'oldest')}
+								>
+									Mais Antigos
+								</button>
+							</div>
+						</div>
+					</div>
 				</div>
+
+				{#if posts.length === 0}
+					<div class="empty-state">
+						<p>📭</p>
+						<p>Nenhum post encontrado</p>
+					</div>
+				{:else}
+					<div class="posts-grid">
+						{#each paginatedPosts as post (post.id)}
+							<article class="post-card glass" transition:fade>
+								<div class="post-image">
+									<img src={post.images?.[0] || post.image_url} alt={post.title} loading="lazy" />
+									<div class="post-type-badge {post.type}">{post.type}</div>
+								</div>
+								<div class="post-content">
+									<h4>{post.title || 'Sem título'}</h4>
+									<p class="post-date">
+										{new Date(post.created_at).toLocaleDateString('pt-BR', {
+											day: '2-digit',
+											month: 'long',
+											year: 'numeric'
+										})}
+									</p>
+
+									<div class="post-actions">
+										<button class="action-btn edit" on:click={() => startEdit(post)} title="Editar">
+											✏️
+										</button>
+										<button
+											class="action-btn delete"
+											on:click={() => confirmDelete(post)}
+											title="Excluir"
+										>
+											🗑️
+										</button>
+									</div>
+								</div>
+							</article>
+						{/each}
+					</div>
+
+					<!-- Pagination -->
+					{#if totalPages > 1}
+						<div class="pagination">
+							<button class="page-btn" disabled={currentPage === 1} on:click={() => currentPage--}>
+								← Anterior
+							</button>
+							<span class="page-info">Página {currentPage} de {totalPages}</span>
+							<button
+								class="page-btn"
+								disabled={currentPage === totalPages}
+								on:click={() => currentPage++}
+							>
+								Próxima →
+							</button>
+						</div>
+					{/if}
+				{/if}
 			</section>
 		</main>
 	{/if}
 </div>
+
+<!-- Delete Confirmation Modal -->
+{#if showDeleteModal}
+	<div
+		class="modal-overlay"
+		on:click={() => (showDeleteModal = false)}
+		on:keydown={(e) => e.key === 'Escape' && (showDeleteModal = false)}
+		role="button"
+		tabindex="0"
+		transition:fade
+	>
+		<div
+			class="modal-content"
+			on:click|stopPropagation
+			on:keydown|stopPropagation
+			role="dialog"
+			aria-modal="true"
+			tabindex="-1"
+			transition:fly={{ y: 20 }}
+		>
+			<h3>Confirmar Exclusão</h3>
+			<p>Tem certeza que deseja excluir este post permanentemente?</p>
+			<p class="modal-warning">Esta ação não pode ser desfeita.</p>
+			<div class="modal-actions">
+				<button class="btn btn-secondary" on:click={() => (showDeleteModal = false)}>
+					Cancelar
+				</button>
+				<button class="btn btn-danger" on:click={deletePost}> Excluir </button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<ToastContainer />
 
 <style>
 	.admin-page {
@@ -817,5 +975,192 @@
 	.btn-sm {
 		padding: 0.5rem 1.5rem;
 		font-size: 0.85rem;
+	}
+
+	/* Filters & Pagination */
+	.list-header {
+		margin-bottom: 2rem;
+	}
+
+	.list-header h3 {
+		margin-bottom: 1.5rem;
+	}
+
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2rem;
+		padding: 1.5rem;
+		background: white;
+		border-radius: 12px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	}
+
+	.filter-group {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.filter-label {
+		font-weight: 600;
+		color: var(--color-text-main);
+		font-size: 0.9rem;
+	}
+
+	.pill-buttons {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.pill-btn {
+		padding: 0.5rem 1rem;
+		border-radius: 20px;
+		border: 2px solid rgba(0, 0, 0, 0.1);
+		background: white;
+		color: var(--color-text-main);
+		font-size: 0.85rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.pill-btn:hover {
+		border-color: var(--color-primary);
+		background: rgba(160, 82, 45, 0.05);
+	}
+
+	.pill-btn.active {
+		border-color: var(--color-primary);
+		background: var(--color-primary);
+		color: white;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 4rem 2rem;
+		color: var(--color-text-light);
+	}
+
+	.empty-state p:first-child {
+		font-size: 3rem;
+		margin-bottom: 1rem;
+	}
+
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 2rem;
+		margin-top: 3rem;
+		padding: 2rem 0;
+	}
+
+	.page-btn {
+		padding: 0.75rem 1.5rem;
+		border-radius: 8px;
+		background: white;
+		border: 1px solid rgba(0, 0, 0, 0.1);
+		color: var(--color-primary);
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.page-btn:hover:not(:disabled) {
+		background: var(--color-primary);
+		color: white;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.page-btn:disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+
+	.page-info {
+		font-weight: 600;
+		color: var(--color-text-main);
+	}
+
+	/* Modal */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+		padding: 1rem;
+	}
+
+	.modal-content {
+		background: white;
+		padding: 2rem;
+		border-radius: 16px;
+		max-width: 400px;
+		width: 100%;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	}
+
+	.modal-content h3 {
+		margin-bottom: 1rem;
+		color: var(--color-text-main);
+	}
+
+	.modal-content p {
+		color: var(--color-text-light);
+		margin-bottom: 0.5rem;
+	}
+
+	.modal-warning {
+		color: #ef4444;
+		font-weight: 600;
+		margin-bottom: 1.5rem;
+	}
+
+	.modal-actions {
+		display: flex;
+		gap: 1rem;
+		justify-content: flex-end;
+	}
+
+	.btn-danger {
+		background: #ef4444;
+		color: white;
+	}
+
+	.btn-danger:hover {
+		background: #dc2626;
+	}
+
+	@media (max-width: 768px) {
+		.filters {
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.filter-group {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.pill-buttons {
+			flex-wrap: wrap;
+		}
+
+		.pagination {
+			gap: 1rem;
+		}
+
+		.page-btn {
+			padding: 0.5rem 1rem;
+			font-size: 0.85rem;
+		}
 	}
 </style>
