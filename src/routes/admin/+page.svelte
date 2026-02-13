@@ -24,7 +24,8 @@
 	let allPosts: any[] = [];
 	let posts: any[] = [];
 	let editingId: string | null = null;
-	let currentImages: string[] = [];
+	let currentImages: Array<{ id: string; url: string }> = [];
+	let newImagePreviews: Array<{ id: number; url: string; file: File }> = [];
 
 	// Filters & Pagination
 	let filterType: 'all' | 'reflexao' | 'conselho' = 'all';
@@ -120,13 +121,16 @@
 		message = '';
 
 		try {
-			let finalImages: string[] = [...currentImages];
+			// 1. Upload new images if any
+			const uploadedUrls: string[] = [];
+			if (newImagePreviews.length > 0) {
+				// Only process if there are new images to upload
+				// Use the reordered files from newImagePreviews
+				const filesToUpload = newImagePreviews.map((p) => p.file);
 
-			// 1. Upload new videos/images
-			if (imageFiles && imageFiles.length > 0) {
-				for (let i = 0; i < imageFiles.length; i++) {
-					const file = imageFiles[i];
-					message = `Convertendo imagem ${i + 1}/${imageFiles.length} para AVIF...`;
+				for (let i = 0; i < filesToUpload.length; i++) {
+					const file = filesToUpload[i];
+					message = `Convertendo imagem ${i + 1}/${filesToUpload.length} para AVIF...`;
 
 					let blob: Blob;
 					try {
@@ -140,7 +144,7 @@
 					const networkBlob = await blob.arrayBuffer();
 					const fileName = `${Date.now()}_${i}.avif`;
 
-					message = `Enviando imagem ${i + 1}/${imageFiles.length}...`;
+					message = `Enviando imagem ${i + 1}/${filesToUpload.length}...`;
 
 					await s3.send(
 						new PutObjectCommand({
@@ -153,9 +157,12 @@
 					);
 
 					const imageUrl = `https://kyzotobotxygdpshpwpw.supabase.co/storage/v1/object/public/images/${fileName}`;
-					finalImages.push(imageUrl);
+					uploadedUrls.push(imageUrl);
 				}
 			}
+
+			// 2. Combine: existing (currentImages) + newly uploaded
+			const finalImages: string[] = [...currentImages.map((img) => img.url), ...uploadedUrls];
 
 			if (finalImages.length === 0) throw new Error('Nenhuma imagem definida');
 
@@ -276,14 +283,23 @@
 		description = post.description || '';
 
 		if (post.images && Array.isArray(post.images)) {
-			currentImages = post.images;
+			currentImages = post.images.map((url: string, index: number) => ({
+				id: `existing-${index}-${url.split('/').pop()}`,
+				url
+			}));
 		} else if (post.image_url) {
-			currentImages = [post.image_url];
+			currentImages = [
+				{
+					id: `existing-0-${post.image_url.split('/').pop()}`,
+					url: post.image_url
+				}
+			];
 		} else {
 			currentImages = [];
 		}
 
 		imageFiles = null;
+		newImagePreviews = [];
 		message = '';
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
@@ -295,6 +311,7 @@
 		description = '';
 		currentImages = [];
 		imageFiles = null;
+		newImagePreviews = [];
 		message = '';
 
 		// Reset file input
@@ -307,7 +324,38 @@
 	}
 
 	function handleImageSort(e: CustomEvent) {
-		currentImages = e.detail.items.map((item: any) => item.url);
+		currentImages = e.detail.items;
+	}
+
+	function handleNewImageSort(e: CustomEvent) {
+		newImagePreviews = e.detail.items;
+	}
+
+	function handleFileChange(e: Event) {
+		const target = e.currentTarget as HTMLInputElement;
+		imageFiles = target.files;
+
+		// Create previews for new images
+		if (imageFiles && imageFiles.length > 0) {
+			newImagePreviews = Array.from(imageFiles).map((file, index) => ({
+				id: Date.now() + index,
+				url: URL.createObjectURL(file),
+				file
+			}));
+		}
+	}
+
+	function removeNewImage(index: number) {
+		newImagePreviews = newImagePreviews.filter((_, i) => i !== index);
+
+		// Update imageFiles to match
+		if (imageFiles) {
+			const dt = new DataTransfer();
+			Array.from(imageFiles).forEach((file, i) => {
+				if (i !== index) dt.items.add(file);
+			});
+			imageFiles = dt.files;
+		}
 	}
 </script>
 
@@ -359,7 +407,7 @@
 								type="file"
 								accept="image/*"
 								multiple
-								on:change={(e) => (imageFiles = e.currentTarget.files)}
+								on:change={handleFileChange}
 								class="file-input"
 							/>
 							<small class="hint"
@@ -367,25 +415,53 @@
 							>
 						</div>
 
+						{#if newImagePreviews.length > 0}
+							<div class="current-images full-width">
+								<label>Novas Imagens: <small class="hint">(Arraste para reordenar)</small></label>
+								<div
+									class="image-grid"
+									use:dndzone={{ items: newImagePreviews, flipDurationMs }}
+									on:consider={handleNewImageSort}
+									on:finalize={handleNewImageSort}
+								>
+									{#each newImagePreviews as item, i (item.id)}
+										<div class="image-thumb" transition:fade>
+											<div class="drag-handle">⋮⋮</div>
+											<img src={item.url} alt="Preview" />
+											<button
+												class="remove-icon-btn"
+												on:click={() => removeNewImage(i)}
+												title="Remover imagem"
+											>
+												✕
+											</button>
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
+
 						{#if currentImages.length > 0}
 							<div class="current-images full-width">
 								<label>Imagens Atuais: <small class="hint">(Arraste para reordenar)</small></label>
 								<div
 									class="image-grid"
 									use:dndzone={{
-										items: currentImages.map((url, id) => ({ id, url })),
+										items: currentImages,
 										flipDurationMs
 									}}
 									on:consider={handleImageSort}
 									on:finalize={handleImageSort}
 								>
-									{#each currentImages.map((url, id) => ({ id, url })) as item, i (item.id)}
+									{#each currentImages as item, i (item.id)}
 										<div class="image-thumb" transition:fade>
 											<div class="drag-handle">⋮⋮</div>
 											<img src={item.url} alt="Thumb" />
 											<button
 												class="remove-icon-btn"
-												on:click={() => removeImage(i)}
+												on:click={() => {
+													currentImages = currentImages.filter((img) => img.id !== item.id);
+												}}
 												title="Remover imagem"
 											>
 												✕
