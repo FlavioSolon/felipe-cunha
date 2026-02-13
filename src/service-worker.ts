@@ -34,6 +34,8 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    // Only cache http/https requests, ignore chrome-extensions etc
+    if (!event.request.url.startsWith('http')) return;
     // Simple cache-falling-back-to-network strategy
     if (event.request.method !== 'GET') return;
 
