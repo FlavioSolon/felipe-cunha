@@ -186,14 +186,10 @@
 	/* ... (unchanged styles) */
 
 	/* Custom overrides specifically for buttons to fine-tune sizes */
-	.like-btn svg {
-		width: 40px !important; /* Larger like button */
-		height: 40px !important;
-	}
-
+	.like-btn svg,
 	.share-btn svg {
-		width: 24px !important; /* Smaller share button */
-		height: 24px !important;
+		width: 32px !important; /* Equal size for both */
+		height: 32px !important;
 	}
 
 	.nav-btn {
@@ -266,7 +262,7 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		padding: 2rem 1.5rem 5rem 1.5rem; /* Bottom padding for nav bar safe area */
+		padding: 2rem 1.5rem 3rem 1.5rem; /* Reduced bottom padding to lower content */
 		color: white;
 		z-index: 10;
 		display: flex;
@@ -294,8 +290,12 @@
 
 	.actions {
 		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
+		flex-direction: row; /* Horizontal alignment */
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		gap: 0; /* Gap handled by justify-between */
+		margin-top: 1rem;
 	}
 
 	.read-more-btn {
