@@ -30,12 +30,24 @@
 		}
 	}
 
+	let showNotificationBtn = false;
+
+	onMount(() => {
+		if ('Notification' in window && Notification.permission === 'default') {
+			showNotificationBtn = true;
+		}
+	});
+
 	async function handleSubscribe() {
 		const granted = await Notification.requestPermission();
 		if (granted === 'granted') {
 			const success = await subscribeUser();
-			if (success) alert('Notificações ativadas! Você receberá novidades em breve.');
-			else alert('Erro ao ativar notificações.');
+			if (success) {
+				alert('Notificações ativadas! Você receberá novidades em breve.');
+				showNotificationBtn = false;
+			} else {
+				alert('Erro ao ativar notificações.');
+			}
 		} else {
 			alert('Permissão de notificação negada.');
 		}
@@ -64,22 +76,24 @@
 		<h1 class="feed-title">{title}</h1>
 
 		<div class="header-actions">
-			<button class="icon-btn-header" on:click={handleSubscribe} aria-label="Ativar Notificações">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="2"
-					stroke="currentColor"
-					class="w-6 h-6"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-					/>
-				</svg>
-			</button>
+			{#if showNotificationBtn}
+				<button class="icon-btn-header" on:click={handleSubscribe} aria-label="Ativar Notificações">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="2"
+						stroke="currentColor"
+						class="w-6 h-6"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+						/>
+					</svg>
+				</button>
+			{/if}
 			<button class="icon-btn-header" on:click={surpriseMe} aria-label="Surpreenda-me">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
