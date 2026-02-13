@@ -11,6 +11,8 @@
 	let liked = false;
 	let shareText = 'Compartilhar';
 
+	import { supabase } from '$lib/supabaseClient';
+
 	function nextImage() {
 		if (currentImageIndex < item.images.length - 1) {
 			currentImageIndex++;
@@ -23,9 +25,26 @@
 		}
 	}
 
-	function toggleLike() {
+	async function toggleLike() {
 		liked = !liked;
-		// In a real app, this would update the backend
+		const newLikes = item.likes + (liked ? 1 : 0);
+
+		// Optimistic UI update already happens in the template via {item.likes + (liked ? 1 : 0)}
+		// But let's persist it.
+
+		try {
+			// Fetch current to be safe-ish or just update blindly based on current + 1
+			const { data } = await supabase.from('posts').select('likes').eq('id', item.id).single();
+
+			if (data) {
+				const currentDbLikes = data.likes;
+				const updatedLikes = liked ? currentDbLikes + 1 : Math.max(0, currentDbLikes - 1);
+
+				await supabase.from('posts').update({ likes: updatedLikes }).eq('id', item.id);
+			}
+		} catch (err) {
+			console.error('Error updating likes:', err);
+		}
 	}
 
 	async function share() {
@@ -176,8 +195,6 @@
 </div>
 
 <style>
-	/* ... (unchanged styles) */
-
 	/* Custom overrides specifically for buttons to fine-tune sizes */
 
 	.share-btn svg {

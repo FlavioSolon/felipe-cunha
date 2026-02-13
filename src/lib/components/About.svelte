@@ -58,7 +58,7 @@
 				</button>
 
 				<div class="contact-wrapper">
-					<span class="contact-label">Convites e Ministrações</span>
+					<span class="contact-label">Contato</span>
 					<a href="mailto:felipejcunhaa@gmail.com" class="contact-link">felipejcunhaa@gmail.com</a>
 				</div>
 
