@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { FeedPost } from '$lib/data/feed';
 	import { fade } from 'svelte/transition';
+	import cactoIcon from '$lib/assets/icones/cacto.ico';
+	import cactoChamasIcon from '$lib/assets/icones/cacto_chamas.ico';
 
 	export let item: FeedPost;
 	export let onReadMore: (item: FeedPost) => void;
@@ -143,20 +145,11 @@
 
 			<div class="social-actions">
 				<button class="icon-btn like-btn" class:liked on:click={toggleLike} aria-label="Like">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill={liked ? 'currentColor' : 'none'}
-						viewBox="0 0 24 24"
-						stroke-width="1.5"
-						stroke="currentColor"
-						class="w-8 h-8"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-						/>
-					</svg>
+					{#if liked}
+						<img src={cactoChamasIcon} alt="Liked" class="cacto-icon liked-anim" />
+					{:else}
+						<img src={cactoIcon} alt="Like" class="cacto-icon" />
+					{/if}
 					<span class="count">{item.likes + (liked ? 1 : 0)}</span>
 				</button>
 
@@ -186,10 +179,42 @@
 	/* ... (unchanged styles) */
 
 	/* Custom overrides specifically for buttons to fine-tune sizes */
-	.like-btn svg,
+
 	.share-btn svg {
-		width: 32px !important; /* Equal size for both */
+		width: 32px !important;
 		height: 32px !important;
+	}
+
+	.like-btn {
+		flex-direction: row !important; /* Force horizontal layout for like button */
+		gap: 0 !important; /* Removed gap to bring count closer */
+		align-items: center;
+	}
+
+	.cacto-icon {
+		width: 104px; /* Increased size significantly as requested */
+		height: 104px;
+		transition: transform 0.2s;
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+	}
+
+	.liked-anim {
+		animation: fire-pop 1.5s ease-out; /* Slower animation as requested */
+	}
+
+	@keyframes fire-pop {
+		0% {
+			transform: scale(1);
+			filter: brightness(1);
+		}
+		50% {
+			transform: scale(1.3);
+			filter: brightness(1.2) drop-shadow(0 0 10px orange);
+		}
+		100% {
+			transform: scale(1);
+			filter: brightness(1);
+		}
 	}
 
 	.nav-btn {
@@ -347,18 +372,20 @@
 		transform: scale(0.9);
 	}
 
-	.like-btn.liked {
-		color: #ff4d4d;
-	}
-
-	.like-btn.liked svg {
-		fill: #ff4d4d;
-	}
+	/* 
+    .like-btn.liked { color: #ff4d4d; } 
+    .like-btn.liked svg { fill: #ff4d4d; }
+    Replaced by image logic above
+    */
 
 	.count {
-		font-size: 0.75rem;
+		font-size: 0.9rem; /* Slightly larger font */
 		font-family: 'Montserrat', sans-serif;
-		opacity: 0.9;
+		opacity: 1; /* More visible */
+		font-weight: 600;
+		margin-left: -10px; /* Pull count closer to the large icon */
+		margin-bottom: 10px; /* Align slightly with the visual center of the cactus */
+		z-index: 5; /* Ensure it's above any potential overlap */
 	}
 
 	/* Carousel Indicators */
