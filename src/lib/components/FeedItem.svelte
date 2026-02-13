@@ -392,9 +392,10 @@
 		font-family: 'Montserrat', sans-serif;
 		opacity: 1; /* More visible */
 		font-weight: 600;
-		margin-left: -10px; /* Pull count closer to the large icon */
-		margin-bottom: 10px; /* Align slightly with the visual center of the cactus */
+		margin-left: -20px; /* Further increased negative margin to pull count much closer */
+		margin-bottom: 20px; /* Adjusted vertical alignment for new position */
 		z-index: 5; /* Ensure it's above any potential overlap */
+		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Enhance readability against icon overlap if any */
 	}
 
 	/* Carousel Indicators */
