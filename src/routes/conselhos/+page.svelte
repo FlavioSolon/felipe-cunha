@@ -34,4 +34,4 @@
 	/>
 </svelte:head>
 
-<VerticalFeed {items} title="Conselhos" />
+<VerticalFeed {items} title="Conselhos do Campo" />

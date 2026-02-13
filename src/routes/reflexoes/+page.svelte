@@ -34,4 +34,4 @@
 	/>
 </svelte:head>
 
-<VerticalFeed {items} title="Reflexões" />
+<VerticalFeed {items} title="Reflexões do Campo" />

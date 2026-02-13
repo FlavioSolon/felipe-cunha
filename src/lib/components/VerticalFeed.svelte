@@ -117,29 +117,39 @@
 		font-size: 1.2rem;
 		margin: 0;
 		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+		font-weight: 700;
+		letter-spacing: 0.5px;
 	}
 
 	.back-link,
 	.surprise-btn {
 		color: white;
-		background: rgba(255, 255, 255, 0.2);
-		backdrop-filter: blur(4px);
-		width: 40px;
-		height: 40px;
+		background: rgba(255, 255, 255, 0.15);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		width: 44px;
+		height: 44px;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		text-decoration: none;
-		border: none;
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		cursor: pointer;
-		transition: transform 0.2s;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
 
 	.back-link:hover,
 	.surprise-btn:hover {
-		background: rgba(255, 255, 255, 0.3);
-		transform: scale(1.1);
+		background: rgba(255, 255, 255, 0.25);
+		transform: scale(1.05);
+		border-color: rgba(255, 255, 255, 0.4);
+	}
+
+	.back-link:active,
+	.surprise-btn:active {
+		transform: scale(0.95);
 	}
 
 	.feed-scroller {
