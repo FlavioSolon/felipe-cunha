@@ -238,6 +238,7 @@
 
 	let postToDelete: any = null;
 	let showDeleteModal = false;
+	let deleting = false;
 
 	function confirmDelete(post: any) {
 		postToDelete = post;
@@ -246,6 +247,8 @@
 
 	async function deletePost() {
 		if (!postToDelete) return;
+
+		deleting = true;
 
 		// 1. Delete images from Storage
 		const imagesToDelete =
@@ -272,6 +275,7 @@
 			toasts.error('Erro ao excluir post');
 		}
 
+		deleting = false;
 		showDeleteModal = false;
 		postToDelete = null;
 	}
@@ -650,10 +654,20 @@
 			<p>Tem certeza que deseja excluir este post permanentemente?</p>
 			<p class="modal-warning">Esta ação não pode ser desfeita.</p>
 			<div class="modal-actions">
-				<button class="btn btn-secondary" on:click={() => (showDeleteModal = false)}>
+				<button
+					class="btn btn-secondary"
+					on:click={() => (showDeleteModal = false)}
+					disabled={deleting}
+				>
 					Cancelar
 				</button>
-				<button class="btn btn-danger" on:click={deletePost}> Excluir </button>
+				<button class="btn btn-danger" on:click={deletePost} disabled={deleting}>
+					{#if deleting}
+						<span class="spinner"></span> Excluindo...
+					{:else}
+						Excluir
+					{/if}
+				</button>
 			</div>
 		</div>
 	</div>
