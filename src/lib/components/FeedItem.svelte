@@ -10,8 +10,11 @@
 	let currentImageIndex = 0;
 	let liked = false;
 	let shareText = 'Compartilhar';
+	let likesCount = item.likes; // Local state for display
 
 	import { supabase } from '$lib/supabaseClient';
+
+	import { onMount } from 'svelte';
 
 	function nextImage() {
 		if (currentImageIndex < item.images.length - 1) {
@@ -25,19 +28,45 @@
 		}
 	}
 
+	onMount(() => {
+		// Check local storage for like status
+		const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+		if (likedPosts.includes(item.id)) {
+			liked = true;
+			// If already liked locally, we assume server count includes it (so we don't add +1)
+			// But if we toggle OFF, we should subtract 1.
+		}
+	});
+
 	async function toggleLike() {
 		liked = !liked;
-		const newLikes = item.likes + (liked ? 1 : 0);
 
-		// Optimistic UI update already happens in the template via {item.likes + (liked ? 1 : 0)}
-		// But let's persist it.
+		// Update local display immediately
+		if (liked) {
+			likesCount++;
+		} else {
+			likesCount = Math.max(0, likesCount - 1);
+		}
+
+		// Update Local Storage
+		const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+		if (liked) {
+			if (!likedPosts.includes(item.id)) likedPosts.push(item.id);
+		} else {
+			const index = likedPosts.indexOf(item.id);
+			if (index > -1) likedPosts.splice(index, 1);
+		}
+		localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
 
 		try {
-			// Fetch current to be safe-ish or just update blindly based on current + 1
+			// Fetch current from DB to ensure consistency
 			const { data } = await supabase.from('posts').select('likes').eq('id', item.id).single();
 
 			if (data) {
 				const currentDbLikes = data.likes;
+				// If we JUST liked it, we want DB = current + 1
+				// If we JUST unliked it, we want DB = current - 1
+				// Note: currentDbLikes might have changed by others, but we apply OUR delta.
 				const updatedLikes = liked ? currentDbLikes + 1 : Math.max(0, currentDbLikes - 1);
 
 				await supabase.from('posts').update({ likes: updatedLikes }).eq('id', item.id);
@@ -169,7 +198,7 @@
 					{:else}
 						<img src={cactoIcon} alt="Like" class="cacto-icon" />
 					{/if}
-					<span class="count">{item.likes + (liked ? 1 : 0)}</span>
+					<span class="count">{likesCount}</span>
 				</button>
 
 				<button class="icon-btn share-btn" on:click={share} aria-label="Share">
