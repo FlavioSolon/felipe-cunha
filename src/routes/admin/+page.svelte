@@ -3,6 +3,8 @@
 	import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 	import { fade, slide } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import { dndzone } from 'svelte-dnd-action';
+	const flipDurationMs = 200;
 
 	let password = '';
 	let authenticated = false;
@@ -128,6 +130,7 @@
 
 			// 2. Insert or Update DB
 			let postTitle = title || 'Nova Publicação';
+			const isUpdate = !!editingId;
 
 			if (editingId) {
 				const { error: dbError } = await supabase
@@ -148,22 +151,28 @@
 					images: finalImages
 				});
 				if (dbError) throw dbError;
+			}
 
-				// Trigger Push Notification for NEW posts only
-				try {
-					fetch('/api/notify', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							title: postTitle,
-							body: description ? description.substring(0, 100) : 'Confira o novo conteúdo!',
-							url: `/${type === 'conselho' ? 'conselhos' : 'reflexoes'}` // Deep link logic could be improved
-							// Ideally finding the specific post ID, but for now linking to feed is okay
-						})
-					});
-				} catch (notifyErr) {
-					console.error('Notification trigger failed', notifyErr);
-				}
+			// Trigger Push Notification for both CREATE and UPDATE
+			try {
+				const notificationBody = isUpdate
+					? `Atualizado: ${description ? description.substring(0, 80) : 'Confira as mudanças!'}`
+					: description
+						? description.substring(0, 100)
+						: 'Confira o novo conteúdo!';
+
+				await fetch('/api/notify', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						title: isUpdate ? `📝 ${postTitle}` : `✨ ${postTitle}`,
+						body: notificationBody,
+						url: `/${type === 'conselho' ? 'conselhos' : 'reflexoes'}`
+					})
+				});
+				console.log('Notification sent successfully');
+			} catch (notifyErr) {
+				console.error('Notification trigger failed', notifyErr);
 			}
 
 			message = 'Sucesso!';
@@ -239,10 +248,18 @@
 		currentImages = [];
 		imageFiles = null;
 		message = '';
+
+		// Reset file input
+		const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+		if (fileInput) fileInput.value = '';
 	}
 
 	function removeImage(index: number) {
 		currentImages = currentImages.filter((_, i) => i !== index);
+	}
+
+	function handleImageSort(e: CustomEvent) {
+		currentImages = e.detail.items.map((item: any) => item.url);
 	}
 </script>
 
@@ -304,11 +321,20 @@
 
 						{#if currentImages.length > 0}
 							<div class="current-images full-width">
-								<label>Imagens Atuais:</label>
-								<div class="image-grid">
-									{#each currentImages as img, i}
+								<label>Imagens Atuais: <small class="hint">(Arraste para reordenar)</small></label>
+								<div
+									class="image-grid"
+									use:dndzone={{
+										items: currentImages.map((url, id) => ({ id, url })),
+										flipDurationMs
+									}}
+									on:consider={handleImageSort}
+									on:finalize={handleImageSort}
+								>
+									{#each currentImages.map((url, id) => ({ id, url })) as item, i (item.id)}
 										<div class="image-thumb" transition:fade>
-											<img src={img} alt="Thumb" />
+											<div class="drag-handle">⋮⋮</div>
+											<img src={item.url} alt="Thumb" />
 											<button
 												class="remove-icon-btn"
 												on:click={() => removeImage(i)}
@@ -405,9 +431,6 @@
 	.admin-page {
 		min-height: 100vh;
 		background-color: #e5e5e5; /* Neutral background specific for admin */
-		background-image:
-			linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
-			url('/background-pattern.png'); /* If exists, otherwise plain color */
 		color: var(--color-text-main);
 		font-family: var(--font-secondary);
 	}
@@ -593,6 +616,26 @@
 		border-radius: 8px;
 		overflow: hidden;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		cursor: grab;
+		transition: transform 0.2s;
+	}
+
+	.image-thumb:active {
+		cursor: grabbing;
+		transform: scale(1.05);
+	}
+
+	.drag-handle {
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		background: rgba(0, 0, 0, 0.6);
+		color: white;
+		padding: 2px 4px;
+		border-radius: 4px;
+		font-size: 0.7rem;
+		z-index: 10;
+		pointer-events: none;
 	}
 
 	.image-thumb img {
