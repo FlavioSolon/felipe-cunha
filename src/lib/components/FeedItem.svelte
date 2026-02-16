@@ -502,7 +502,7 @@
 		cursor: pointer;
 		display: flex;
 		align-items: center;
-		gap: 0.4rem;
+		gap: 0.0005rem; /* Very close to icon */
 		color: #8b6d4d;
 		padding: 0;
 		transition: transform 0.2s;
@@ -514,16 +514,17 @@
 	}
 
 	.social-icon {
-		width: 72px; /* Much larger for visibility */
-		height: 72px;
+		width: 120px; /* Larger for more prominence */
+		height: 120px;
 		object-fit: contain;
 	}
 
 	.like-counter {
 		font-family: 'Inter', sans-serif;
 		font-weight: 700;
-		font-size: 0.9rem;
+		font-size: 1rem; /* Slightly larger */
 		color: #3b2c1e;
+		margin-left: -35px; /* Pull closer to cactus icon */
 	}
 
 	.flame-anim {
