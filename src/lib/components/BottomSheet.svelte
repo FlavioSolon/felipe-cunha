@@ -153,15 +153,40 @@
 	}
 
 	.sheet-content {
-		padding: 1.5rem;
+		padding: 2rem 1.5rem;
 		overflow-y: auto;
 		overscroll-behavior: contain;
-		font-family: 'Montserrat', sans-serif;
-		line-height: 1.8;
-		color: #333;
+
+		/* Letter-style formatting */
+		font-family: 'Inter', 'Georgia', serif;
+		line-height: 2;
+		color: #2c2416;
 		font-size: 1.05rem;
-		white-space: pre-wrap; /* Preserve line breaks from content */
-		padding-bottom: 3rem; /* Extra padding for bottom safe area */
+		white-space: pre-wrap;
+		padding-bottom: 3rem;
+
+		/* Letter aesthetics */
+		text-align: justify;
+		text-indent: 2em; /* First line indent */
+		letter-spacing: 0.01em;
+		word-spacing: 0.05em;
+
+		/* Paragraph spacing */
+		background: linear-gradient(to bottom, rgba(253, 246, 227, 0) 0%, rgba(253, 246, 227, 1) 5%);
+	}
+
+	/* Letter paragraph styling */
+	.sheet-content p {
+		margin-bottom: 1.5em;
+		text-indent: 2em;
+	}
+
+	.sheet-content p:first-child {
+		margin-top: 0;
+	}
+
+	.sheet-content p:last-child {
+		margin-bottom: 0;
 	}
 
 	/* Scrollbar styling */

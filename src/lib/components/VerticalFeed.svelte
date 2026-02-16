@@ -134,7 +134,7 @@
 	.feed-container {
 		width: 100%;
 		height: 100dvh;
-		background-color: #000;
+		background-color: #000; /* Pure black */
 		position: relative;
 	}
 
@@ -143,11 +143,11 @@
 		top: 0;
 		left: 0;
 		width: 100%;
-		padding: 1rem 1.5rem;
+		padding: max(1rem, env(safe-area-inset-top)) 1.5rem 1rem 1.5rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		z-index: 50;
+		z-index: 1001;
 		background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
 		pointer-events: none; /* Let clicks pass through to scroller where not strictly on buttons */
 	}
@@ -169,6 +169,7 @@
 	.header-actions {
 		display: flex;
 		gap: 0.8rem;
+		z-index: 1002;
 	}
 
 	.back-link,
@@ -177,6 +178,8 @@
 		background: rgba(255, 255, 255, 0.15);
 		backdrop-filter: blur(8px);
 		-webkit-backdrop-filter: blur(8px);
+		min-width: 44px;
+		min-height: 44px;
 		width: 44px;
 		height: 44px;
 		border-radius: 50%;
@@ -188,6 +191,8 @@
 		cursor: pointer;
 		transition: all 0.3s ease;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		position: relative;
+		z-index: 1003;
 	}
 
 	.back-link:hover,
@@ -218,6 +223,9 @@
 		scroll-snap-align: start;
 		height: 100dvh;
 		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.date {
@@ -225,5 +233,30 @@
 		margin-top: 1rem;
 		text-align: right;
 		display: block;
+	}
+
+	/* Desktop Modal Effect - Over Home Background */
+	@media (min-width: 850px) {
+		.feed-container {
+			background: transparent; /* Allow home to show through */
+		}
+
+		.feed-container::before {
+			content: '';
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.85);
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			z-index: 0;
+		}
+
+		.feed-scroller {
+			position: relative;
+			z-index: 1;
+		}
 	}
 </style>

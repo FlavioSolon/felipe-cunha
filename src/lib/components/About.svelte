@@ -62,7 +62,7 @@
 					<a href="mailto:felipejcunhaa@gmail.com" class="contact-link">felipejcunhaa@gmail.com</a>
 				</div>
 
-				<div class="signature">Felipe Cunha - O Evangelho nasce na poeira.</div>
+				<div class="signature">Felipe Cunha</div>
 			</div>
 		</div>
 	</div>
