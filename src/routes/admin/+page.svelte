@@ -6,6 +6,7 @@
 	import { dndzone } from 'svelte-dnd-action';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
 	import { toasts } from '$lib/stores/toastStore';
+	import { resizeAndCropImage } from '$lib/imageResize';
 	const flipDurationMs = 200;
 
 	let password = '';
@@ -134,11 +135,24 @@
 
 					let blob: Blob;
 					try {
-						blob = await convertToAvif(file);
+						// 1. Resize and crop first (414x517.5px - 4:5 aspect ratio)
+						message = `Redimensionando imagem ${i + 1}/${filesToUpload.length}...`;
+						const resizedBlob = await resizeAndCropImage(file, 414, 517.5);
+
+						// 2. Convert to AVIF
+						message = `Convertendo imagem ${i + 1}/${filesToUpload.length} para AVIF...`;
+						const resizedFile = new File([resizedBlob], file.name, { type: 'image/jpeg' });
+						blob = await convertToAvif(resizedFile);
 					} catch (e) {
-						console.warn('AVIF conversion failed, falling back to original or WebP');
-						// Simple fallback logic could go here, for now throwing error to be safe
-						throw e;
+						console.warn('Image processing failed:', e);
+						// Fallback to original file processing if resize fails
+						try {
+							console.log('Tentando conversão direta sem resize...');
+							blob = await convertToAvif(file);
+						} catch (fallbackError) {
+							console.error('Falha crítica na conversão de imagem', fallbackError);
+							throw e;
+						}
 					}
 
 					const networkBlob = await blob.arrayBuffer();
