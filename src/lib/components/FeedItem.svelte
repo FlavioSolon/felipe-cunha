@@ -322,6 +322,16 @@
 		border: none;
 	}
 
+	.feed-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		display: grid;
+		gap: 2rem;
+		padding-bottom: 80px; /* Space for bottom navigation/footer if needed */
+		min-height: 100vh; /* Ensure full height */
+		background-color: #000;
+	}
+
 	.image-container {
 		width: 100%;
 		position: relative;
@@ -365,6 +375,8 @@
 		background-color: #fdf6e3;
 		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeComposite operator='in' in2='SourceGraphic'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23fdf6e3' filter='url(%23paperNoise)' opacity='0.2'/%3E%3C/svg%3E");
 		padding: 1.5rem;
+		/* Add padding to prevent content from being hidden behind fixed footer */
+		padding-bottom: calc(90px + env(safe-area-inset-bottom));
 		border-radius: 2px;
 		box-shadow:
 			5px 5px 15px rgba(0, 0, 0, 0.3),
@@ -372,6 +384,8 @@
 		border: 1px solid #dcd4c1;
 		position: relative;
 		transform: rotate(-0.5deg);
+		/* Ensure background covers everything */
+		overflow: visible;
 	}
 
 	/* Card Details */
@@ -436,17 +450,19 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		width: 100%;
-		max-width: 100vw;
-		padding: 1rem 1.5rem;
-		padding-bottom: max(1rem, env(safe-area-inset-bottom));
-		background: #fdf6e3; /* Solid color to match card */
+		/* Use auto height to accommodate safe area naturally */
+		height: calc(80px + env(safe-area-inset-bottom));
+		padding: 0 1.5rem;
+		padding-bottom: env(safe-area-inset-bottom);
+		background: #fdf6e3; /* Solid background */
+		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeComposite operator='in' in2='SourceGraphic'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23fdf6e3' filter='url(%23paperNoise)' opacity='0.2'/%3E%3C/svg%3E");
 		border-top: 1px solid rgba(139, 115, 85, 0.2);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		z-index: 100;
+		z-index: 99999; /* Highest priority */
 		box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+		box-sizing: border-box; /* Prevent padding from adding to width */
 	}
 
 	.read-more-link {
@@ -478,6 +494,20 @@
 	/* Mobile: Show truncated content */
 	.content-mobile {
 		display: block;
+		margin-bottom: 3rem; /* Extra space before footer */
+		height: 140px; /* Fixed height for consistency */
+		overflow: hidden; /* Hide overflow */
+	}
+
+	.content-mobile p {
+		display: -webkit-box;
+		line-clamp: 5;
+		-webkit-line-clamp: 5; /* Limit to 5 lines */
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.6;
+		margin: 0;
 	}
 
 	.content-desktop {
@@ -674,15 +704,19 @@
 			background: rgba(139, 115, 85, 0.5);
 		}
 
-		/* Desktop: Fixed footer */
+		/* Desktop: Fixed footer - restore normal flow */
 		.card-footer {
-			position: static; /* Remove fixed position */
-			margin-top: auto;
-			flex-shrink: 0;
+			position: static;
+			height: auto;
+			width: auto;
+			max-width: none;
 			padding: 1rem 0 0 0;
+			margin-top: auto;
 			background: none;
-			backdrop-filter: none;
-			-webkit-backdrop-filter: none;
+			box-shadow: none;
+			border-top: 1px solid rgba(139, 115, 85, 0.2);
+			z-index: auto;
+			box-sizing: border-box;
 		}
 
 		/* Desktop: Show full content, hide mobile content */
