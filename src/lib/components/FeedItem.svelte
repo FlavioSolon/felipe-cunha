@@ -15,6 +15,7 @@
 
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
+	import { toastStore } from '$lib/stores/toastStore';
 
 	// Mobile truncation limit - prioritize image
 	const MOBILE_CHAR_LIMIT = 150;
@@ -106,6 +107,7 @@
 		} else {
 			navigator.clipboard.writeText(window.location.href);
 			shareText = 'Link Copiado!';
+			toastStore.success('Link copiado para a área de transferência!');
 			setTimeout(() => (shareText = 'Compartilhar'), 2000);
 		}
 	}
@@ -381,6 +383,7 @@
 		position: relative;
 		/* Ensure background covers everything */
 		overflow: hidden;
+		pointer-events: auto; /* Restore interaction for children */
 	}
 
 	/* Card Details */
