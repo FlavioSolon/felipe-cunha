@@ -1,5 +1,5 @@
 <script lang="ts">
-	import reflexoesImg from '$lib/assets/casal.jpg';
+	import reflexoesImg from '$lib/assets/pastora.jpeg';
 	import conselhosImg from '$lib/assets/felipe_pregando.jpg';
 	import { reveal } from '$lib/actions/reveal';
 </script>

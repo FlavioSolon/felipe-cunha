@@ -16,6 +16,9 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 	import { toastStore } from '$lib/stores/toastStore';
+	import ShareModal from './ShareModal.svelte';
+
+	let showShareModal = false;
 
 	// Mobile truncation limit - prioritize image
 	const MOBILE_CHAR_LIMIT = 150;
@@ -94,21 +97,19 @@
 	}
 
 	async function share() {
-		if (navigator.share) {
+		const isMobile = window.innerWidth <= 850;
+		if (navigator.share && isMobile) {
 			try {
 				await navigator.share({
 					title: item.title,
 					text: item.content.substring(0, 100) + '...',
-					url: window.location.href
+					url: window.location.href.split('#')[0] + '#post-' + item.id
 				});
 			} catch (err) {
 				console.log('Error sharing:', err);
 			}
 		} else {
-			navigator.clipboard.writeText(window.location.href);
-			shareText = 'Link Copiado!';
-			toastStore.success('Link copiado para a área de transferência!');
-			setTimeout(() => (shareText = 'Compartilhar'), 2000);
+			showShareModal = true;
 		}
 	}
 </script>
@@ -274,6 +275,8 @@
 		</div>
 	</div>
 </div>
+
+<ShareModal isOpen={showShareModal} post={item} on:close={() => (showShareModal = false)} />
 
 <style>
 	/* Clean Black Background */
