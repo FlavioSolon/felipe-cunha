@@ -276,12 +276,10 @@
 <style>
 	/* Clean Black Background */
 	.feed-item {
-		height: 100dvh;
 		width: 100%;
 		position: relative;
-		overflow: hidden;
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: center;
 		background: #000; /* Pure black */
 	}
@@ -292,15 +290,15 @@
 
 	.content-wrapper {
 		width: 100%;
-		max-width: 100%; /* Full width on mobile */
-		height: 100%;
+		max-width: 600px; /* Instagram-like max width */
 		position: relative;
 		z-index: 2;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: flex-start;
 		padding: 0;
 		gap: 0;
+		background: #000;
 	}
 
 	/* Image Section (Instagram-Style) */
@@ -362,30 +360,27 @@
 	}
 
 	/* Description Section (Field Letter) */
+	/* Description Section (Field Letter) */
 	.description-section {
 		flex: 0 0 auto;
 		display: flex;
 		justify-content: center;
 		position: relative;
+		width: 100%;
+		pointer-events: none; /* Let clicks pass through description section container */
 	}
 
 	.field-letter-card {
 		width: 100%;
-		max-width: 500px;
+		max-width: 100%;
 		background-color: #fdf6e3;
 		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeComposite operator='in' in2='SourceGraphic'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23fdf6e3' filter='url(%23paperNoise)' opacity='0.2'/%3E%3C/svg%3E");
 		padding: 1.5rem;
-		/* Add padding to prevent content from being hidden behind fixed footer */
-		padding-bottom: calc(90px + env(safe-area-inset-bottom));
-		border-radius: 2px;
-		box-shadow:
-			5px 5px 15px rgba(0, 0, 0, 0.3),
-			inset 0 0 80px rgba(139, 115, 85, 0.15);
-		border: 1px solid #dcd4c1;
+		border-radius: 0; /* flush like instagram */
+		border: none; /* remove borders for cleaner look */
 		position: relative;
-		transform: rotate(-0.5deg);
 		/* Ensure background covers everything */
-		overflow: visible;
+		overflow: hidden;
 	}
 
 	/* Card Details */
@@ -444,25 +439,20 @@
 		margin-bottom: 0;
 	}
 
-	/* Card footer - fixed at bottom of screen */
+	/* Card footer - Normal document flow */
 	.card-footer {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		/* Use auto height to accommodate safe area naturally */
-		height: calc(80px + env(safe-area-inset-bottom));
-		padding: 0 1.5rem;
-		padding-bottom: env(safe-area-inset-bottom);
-		background: #fdf6e3; /* Solid background */
-		background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeComposite operator='in' in2='SourceGraphic'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23fdf6e3' filter='url(%23paperNoise)' opacity='0.2'/%3E%3C/svg%3E");
+		position: static;
+		height: auto;
+		padding: 1rem 0 0 0;
+		margin-top: 1rem;
+		background: transparent;
 		border-top: 1px solid rgba(139, 115, 85, 0.2);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		z-index: 99999; /* Highest priority */
-		box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-		box-sizing: border-box; /* Prevent padding from adding to width */
+		z-index: auto;
+		box-shadow: none;
+		box-sizing: border-box;
 	}
 
 	.read-more-link {
@@ -491,12 +481,18 @@
 		color: #5d4631;
 	}
 
+	/* Internal scroll logic - Reset for normal flow */
+	.card-body-scroll {
+		/* display: block; Default */
+	}
+
 	/* Mobile: Show truncated content */
 	.content-mobile {
 		display: block;
-		margin-bottom: 3rem; /* Extra space before footer */
-		height: 140px; /* Fixed height for consistency */
+		margin-bottom: 2rem; /* Extra space before footer */
+		height: auto; /* Let it grow naturally with content and lines clamp */
 		overflow: hidden; /* Hide overflow */
+		flex-shrink: 0;
 	}
 
 	.content-mobile p {
@@ -664,6 +660,7 @@
 		.description-section {
 			flex: 0 0 50%;
 			justify-content: center;
+			pointer-events: auto;
 		}
 
 		.field-letter-card {
@@ -674,6 +671,10 @@
 			display: flex;
 			flex-direction: column;
 			overflow: hidden;
+			position: relative;
+			bottom: auto;
+			border-radius: 8px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
 		}
 
 		/* Desktop: Scrollable content */
@@ -704,19 +705,17 @@
 			background: rgba(139, 115, 85, 0.5);
 		}
 
-		/* Desktop: Fixed footer - restore normal flow */
+		/* Desktop: Fixed footer */
 		.card-footer {
-			position: static;
-			height: auto;
-			width: auto;
-			max-width: none;
-			padding: 1rem 0 0 0;
+			position: static; /* Remove fixed position */
 			margin-top: auto;
+			flex-shrink: 0;
+			padding: 1rem 0 0 0;
 			background: none;
+			backdrop-filter: none;
+			-webkit-backdrop-filter: none;
 			box-shadow: none;
 			border-top: 1px solid rgba(139, 115, 85, 0.2);
-			z-index: auto;
-			box-sizing: border-box;
 		}
 
 		/* Desktop: Show full content, hide mobile content */

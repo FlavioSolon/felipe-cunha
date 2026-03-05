@@ -26,6 +26,41 @@
 			document.body.style.overflow = '';
 		}
 	}
+
+	// Touch to dismiss logic
+	let touchStartY = 0;
+	let currentTranslateY = 0;
+	let isDragging = false;
+	const swipeThreshold = 100;
+
+	function handleTouchStart(e: TouchEvent) {
+		touchStartY = e.touches[0].clientY;
+		isDragging = true;
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		if (!isDragging) return;
+
+		const currentY = e.touches[0].clientY;
+		const deltaY = currentY - touchStartY;
+
+		// Only allow dragging downwards
+		if (deltaY > 0) {
+			currentTranslateY = deltaY;
+		}
+	}
+
+	function handleTouchEnd() {
+		if (!isDragging) return;
+		isDragging = false;
+
+		if (currentTranslateY > swipeThreshold) {
+			close();
+		}
+
+		// Reset visually with animation or immediately if not closing
+		currentTranslateY = 0;
+	}
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -43,12 +78,20 @@
 
 	<div
 		class="sheet"
+		style="transform: translateY({currentTranslateY}px); transition: {isDragging
+			? 'none'
+			: 'transform 0.3s ease-out'}"
 		transition:fly={{ y: 300, duration: 400, opacity: 1 }}
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="sheet-title"
 	>
-		<div class="sheet-header">
+		<div
+			class="sheet-header"
+			on:touchstart={handleTouchStart}
+			on:touchmove={handleTouchMove}
+			on:touchend={handleTouchEnd}
+		>
 			<div class="drag-handle"></div>
 			<div class="header-content">
 				<h2 id="sheet-title">{title}</h2>
@@ -175,20 +218,6 @@
 		background: linear-gradient(to bottom, rgba(253, 246, 227, 0) 0%, rgba(253, 246, 227, 1) 5%);
 	}
 
-	/* Letter paragraph styling */
-	.sheet-content p {
-		margin-bottom: 1.5em;
-		text-indent: 2em;
-	}
-
-	.sheet-content p:first-child {
-		margin-top: 0;
-	}
-
-	.sheet-content p:last-child {
-		margin-bottom: 0;
-	}
-
 	/* Scrollbar styling */
 	.sheet-content::-webkit-scrollbar {
 		width: 6px;
@@ -208,9 +237,6 @@
 			transform: translateX(
 				-50%
 			) !important; /* Override fly transition transform on finish, but we handle enter via transition */
-			/* Note: transform override is tricky with Svelte transitions. 
-               Better to just let it be centered by standard positioning if possible, 
-               or use a wrapper. For simplicity, we just constrain width. */
 			margin-left: -300px; /* simple centering hack if left is 50% */
 			left: 50%;
 			bottom: 2rem;
@@ -220,10 +246,7 @@
 
 		/* Fix for transition conflict with margin centering */
 		.sheet {
-			transform: none !important; /* This might break the fly in animation. 
-             Actually svelte transition handles transform. 
-             Let's rely on Flexbox centering in a wrapper if this was a modal, but as a bottom sheet,
-             position:fixed is standard. */
+			transform: none !important;
 			margin-left: 0;
 			left: 0;
 			right: 0;

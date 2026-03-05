@@ -210,9 +210,11 @@
 	.feed-scroller {
 		height: 100%;
 		overflow-y: scroll;
-		scroll-snap-type: y mandatory;
 		scroll-behavior: smooth;
 		scrollbar-width: none; /* Hide scrollbar Firefox */
+		/* Removes scroll-snap and allows natural flow */
+		padding-top: max(4rem, calc(2rem + env(safe-area-inset-top))); /* Space below header */
+		padding-bottom: 2rem;
 	}
 
 	.feed-scroller::-webkit-scrollbar {
@@ -220,12 +222,11 @@
 	}
 
 	.snap-item {
-		scroll-snap-align: start;
-		height: 100dvh;
 		width: 100%;
 		display: flex;
 		justify-content: center;
-		align-items: center;
+		padding-top: 2rem;
+		min-height: 10px; /* Allow natural height based on child */
 	}
 
 	.date {
