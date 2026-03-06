@@ -113,9 +113,9 @@
 	</nav>
 
 	<main class="feed-scroller">
-		{#each items as item (item.id)}
+		{#each items as item, index (item.id)}
 			<div id="post-{item.id}" class="snap-item">
-				<FeedItem {item} onReadMore={handleReadMore} />
+				<FeedItem {item} isFirstPost={index === 0} onReadMore={handleReadMore} />
 			</div>
 		{/each}
 	</main>
@@ -199,7 +199,7 @@
 		display: flex;
 		justify-content: center;
 		padding-top: 0; /* Remove gap */
-		min-height: 100dvh; /* Fill full height minimum */
+		min-height: auto; /* Let it wrap content on mobile perfectly */
 	}
 
 	.date {
@@ -242,7 +242,8 @@
 		}
 
 		.snap-item {
-			padding-top: 2rem; /* Bring back gap on desktop since they are isolated */
+			padding-top: 5rem; /* Good breathing room on desktop */
+			padding-bottom: 5rem;
 			min-height: auto;
 		}
 

@@ -6,12 +6,18 @@
 
 	export let item: FeedPost;
 	export let onReadMore: (item: FeedPost) => void;
+	export let isFirstPost = false;
 
 	let currentImageIndex = 0;
 	let liked = false;
 	let shareText = 'Compartilhar';
 	let likesCount = item.likes;
 	let preloadedImages = new Set<string>();
+	let loadedImages: boolean[] = Array(item.images.length).fill(false);
+
+	function handleImageLoad(index: number) {
+		loadedImages[index] = true;
+	}
 
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
@@ -124,11 +130,16 @@
 				<div class="image-container">
 					{#each item.images as image, index}
 						<div class="image-slide" class:active={index === currentImageIndex}>
+							{#if !loadedImages[index]}
+								<div class="skeleton-loader"></div>
+							{/if}
 							<img
 								src={image}
 								alt="{item.title} - Imagem {index + 1}"
-								loading={index === 0 ? 'eager' : 'lazy'}
+								loading={isFirstPost && index === 0 ? 'eager' : 'lazy'}
 								decoding="async"
+								on:load={() => handleImageLoad(index)}
+								class:loaded={loadedImages[index]}
 							/>
 						</div>
 					{/each}
@@ -279,14 +290,14 @@
 <ShareModal isOpen={showShareModal} post={item} on:close={() => (showShareModal = false)} />
 
 <style>
-	/* Clean Black Background */
+	/* Clean Black Background on mobile, Transparent on desktop */
 	.feed-item {
 		width: 100%;
 		position: relative;
 		display: flex;
 		align-items: flex-start;
 		justify-content: center;
-		background: #000; /* Pure black */
+		background: transparent;
 	}
 
 	.immersive-background {
@@ -303,7 +314,7 @@
 		justify-content: flex-start;
 		padding: 0;
 		gap: 0;
-		background: #000;
+		background: transparent;
 	}
 
 	/* Image Section (Instagram-Style) */
@@ -348,10 +359,39 @@
 		pointer-events: auto;
 	}
 
+	.skeleton-loader {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%);
+		background-size: 400% 100%;
+		animation: shimmer 1.5s infinite linear;
+		z-index: 1;
+	}
+
+	@keyframes shimmer {
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
+		}
+	}
+
 	.image-slide img {
 		width: 100%;
 		height: 100%;
 		object-fit: contain; /* Full content visible as requested */
+		opacity: 0; /* Hidden until loaded */
+		transition: opacity 0.5s ease;
+		position: relative;
+		z-index: 2;
+	}
+
+	.image-slide img.loaded {
+		opacity: 1;
 	}
 
 	/* Description Section (Field Letter) */
