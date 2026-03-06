@@ -3,6 +3,20 @@
 
 <head>
 	<meta charset="utf-8" />
+	<!-- Suppress Vite Dynamic Import Errors on New Deploys (Vercel Cache) -->
+	<script>
+		window.addEventListener('unhandledrejection', function (event) {
+			if (event.reason && event.reason.name === 'TypeError' &&
+				(event.reason.message.includes('dynamically imported module') || event.reason.message.includes('importing a module script failed'))) {
+				event.preventDefault(); // Prevents the red error from the console
+				console.warn('Deploy detectado: Atualizando a aplicação...');
+				sessionStorage.setItem('build_update_reload', 'true');
+				window.location.reload();
+			} else {
+				sessionStorage.removeItem('build_update_reload');
+			}
+		});
+	</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 
