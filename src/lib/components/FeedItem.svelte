@@ -325,16 +325,6 @@
 		border: none;
 	}
 
-	.feed-container {
-		max-width: 1200px;
-		margin: 0 auto;
-		display: grid;
-		gap: 2rem;
-		padding-bottom: 80px; /* Space for bottom navigation/footer if needed */
-		min-height: 100vh; /* Ensure full height */
-		background-color: #000;
-	}
-
 	.image-container {
 		width: 100%;
 		position: relative;
@@ -449,7 +439,7 @@
 	.card-footer {
 		position: static;
 		height: auto;
-		padding: 1rem 0 0 0;
+		padding: 1rem 0 1rem 0; /* Add bottom padding so it breathes before the next post */
 		margin-top: 1rem;
 		background: transparent;
 		border-top: 1px solid rgba(139, 115, 85, 0.2);
@@ -487,15 +477,10 @@
 		color: #5d4631;
 	}
 
-	/* Internal scroll logic - Reset for normal flow */
-	.card-body-scroll {
-		/* display: block; Default */
-	}
-
 	/* Mobile: Show truncated content */
 	.content-mobile {
 		display: block;
-		margin-bottom: 2rem; /* Extra space before footer */
+		margin-bottom: 0rem; /* Removed extra space before footer for continuous scroll flow */
 		height: auto; /* Let it grow naturally with content and lines clamp */
 		overflow: hidden; /* Hide overflow */
 		flex-shrink: 0;

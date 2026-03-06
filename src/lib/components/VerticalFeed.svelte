@@ -7,7 +7,6 @@
 	import { subscribeUser } from '$lib/push';
 
 	export let items: FeedPost[] = [];
-	export let title = 'Feed';
 
 	let selectedItem: FeedPost | null = null;
 	let isSheetOpen = false;
@@ -55,63 +54,63 @@
 </script>
 
 <div class="feed-container">
-	<!-- Fixed Header/Nav Overlay -->
-	<header class="feed-header">
-		<a href="/" class="back-link" aria-label="Voltar para Home">
+	<!-- Dynamic Navigation Bar (Bottom on Mobile, Left Side on Desktop) -->
+	<nav class="feed-nav" aria-label="Navegação do Feed">
+		<a href="/" class="nav-action-btn" aria-label="Voltar para Home">
+			<!-- Home Icon -->
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke-width="2"
 				stroke="currentColor"
-				class="w-6 h-6"
+				class="nav-icon"
 			>
 				<path
 					stroke-linecap="round"
 					stroke-linejoin="round"
-					d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+					d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.592 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
 				/>
 			</svg>
 		</a>
-		<h1 class="feed-title">{title}</h1>
 
-		<div class="header-actions">
-			{#if showNotificationBtn}
-				<button class="icon-btn-header" on:click={handleSubscribe} aria-label="Ativar Notificações">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke-width="2"
-						stroke="currentColor"
-						class="w-6 h-6"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-						/>
-					</svg>
-				</button>
-			{/if}
-			<button class="icon-btn-header" on:click={surpriseMe} aria-label="Surpreenda-me">
+		{#if showNotificationBtn}
+			<button class="nav-action-btn" on:click={handleSubscribe} aria-label="Ativar Notificações">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke-width="2"
 					stroke="currentColor"
-					class="w-6 h-6"
+					class="nav-icon"
 				>
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
-						d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+						d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
 					/>
 				</svg>
 			</button>
-		</div>
-	</header>
+		{/if}
+
+		<button class="nav-action-btn" on:click={surpriseMe} aria-label="Post Aleatório">
+			<!-- Shuffle Icon -->
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke-width="2"
+				stroke="currentColor"
+				class="nav-icon"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"
+				/>
+			</svg>
+		</button>
+	</nav>
 
 	<main class="feed-scroller">
 		{#each items as item (item.id)}
@@ -138,73 +137,47 @@
 		position: relative;
 	}
 
-	.feed-header {
+	/* Navigation Base - Mobile Bottom Menu Style */
+	.feed-nav {
 		position: fixed;
-		top: 0;
+		bottom: 0;
 		left: 0;
 		width: 100%;
-		padding: max(1rem, env(safe-area-inset-top)) 1.5rem 1rem 1.5rem;
+		height: 60px;
+		background: #000;
+		border-top: 1px solid #222;
 		display: flex;
-		justify-content: space-between;
+		justify-content: space-around;
 		align-items: center;
-		z-index: 1001;
-		background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
-		pointer-events: none; /* Let clicks pass through to scroller where not strictly on buttons */
-	}
-
-	.feed-header > * {
-		pointer-events: auto; /* Re-enable clicks for buttons */
-	}
-
-	.feed-title {
-		font-family: 'Merriweather', serif;
-		color: white;
-		font-size: 1.2rem;
-		margin: 0;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-		font-weight: 700;
-		letter-spacing: 0.5px;
-	}
-
-	.header-actions {
-		display: flex;
-		gap: 0.8rem;
 		z-index: 1002;
+		padding-bottom: env(safe-area-inset-bottom); /* iOS support */
 	}
 
-	.back-link,
-	.icon-btn-header {
-		color: white;
-		background: rgba(255, 255, 255, 0.15);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		min-width: 44px;
-		min-height: 44px;
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
+	.nav-action-btn {
+		background: none;
+		border: none;
+		color: #e0e0e0;
+		width: 50px;
+		height: 50px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		text-decoration: none;
-		border: 1px solid rgba(255, 255, 255, 0.2);
 		cursor: pointer;
-		transition: all 0.3s ease;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		position: relative;
-		z-index: 1003;
+		transition: transform 0.2s;
 	}
 
-	.back-link:hover,
-	.icon-btn-header:hover {
-		background: rgba(255, 255, 255, 0.25);
-		transform: scale(1.05);
-		border-color: rgba(255, 255, 255, 0.4);
+	.nav-action-btn:hover {
+		color: white;
+		transform: scale(1.1);
 	}
 
-	.back-link:active,
-	.icon-btn-header:active {
+	.nav-action-btn:active {
 		transform: scale(0.95);
+	}
+
+	.nav-icon {
+		width: 28px;
+		height: 28px;
 	}
 
 	.feed-scroller {
@@ -212,9 +185,9 @@
 		overflow-y: scroll;
 		scroll-behavior: smooth;
 		scrollbar-width: none; /* Hide scrollbar Firefox */
-		/* Removes scroll-snap and allows natural flow */
-		padding-top: max(4rem, calc(2rem + env(safe-area-inset-top))); /* Space below header */
-		padding-bottom: 2rem;
+		/* Continuous scrolling without top gap */
+		padding-top: 0;
+		padding-bottom: 80px; /* Space for the bottom navigation on mobile */
 	}
 
 	.feed-scroller::-webkit-scrollbar {
@@ -225,8 +198,8 @@
 		width: 100%;
 		display: flex;
 		justify-content: center;
-		padding-top: 2rem;
-		min-height: 10px; /* Allow natural height based on child */
+		padding-top: 0; /* Remove gap */
+		min-height: 100dvh; /* Fill full height minimum */
 	}
 
 	.date {
@@ -236,12 +209,13 @@
 		display: block;
 	}
 
-	/* Desktop Modal Effect - Over Home Background */
+	/* Desktop Modal Effect & Left Side Nav */
 	@media (min-width: 850px) {
 		.feed-container {
-			background: transparent; /* Allow home to show through */
+			background: transparent; /* Allow home to show through on very large monitor */
 		}
 
+		/* Adaptive Background based on System Theme */
 		.feed-container::before {
 			content: '';
 			position: fixed;
@@ -249,15 +223,69 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background: rgba(0, 0, 0, 0.85);
-			backdrop-filter: blur(20px);
-			-webkit-backdrop-filter: blur(20px);
+			background: rgba(244, 241, 234, 0.95); /* Light theme default (Areia) */
 			z-index: 0;
+			backdrop-filter: blur(5px);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.feed-container::before {
+				background: rgba(20, 20, 20, 0.95); /* Dark theme */
+			}
 		}
 
 		.feed-scroller {
 			position: relative;
 			z-index: 1;
+			padding-bottom: 2rem;
+			padding-top: 2rem;
+		}
+
+		.snap-item {
+			padding-top: 2rem; /* Bring back gap on desktop since they are isolated */
+			min-height: auto;
+		}
+
+		/* Desktop Side Navigation */
+		.feed-nav {
+			position: fixed;
+			top: 50%;
+			left: 2rem;
+			bottom: auto;
+			transform: translateY(-50%);
+			width: auto;
+			height: auto;
+			flex-direction: column;
+			gap: 1.5rem;
+			background: transparent;
+			border: none;
+		}
+
+		.nav-action-btn {
+			background: rgba(0, 0, 0, 0.1);
+			color: #333;
+			border-radius: 50%;
+			width: 56px;
+			height: 56px;
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			backdrop-filter: blur(8px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			.nav-action-btn {
+				background: rgba(255, 255, 255, 0.1);
+				color: #e0e0e0;
+				border-color: rgba(255, 255, 255, 0.1);
+			}
+			.nav-action-btn:hover {
+				background: rgba(255, 255, 255, 0.2);
+				color: white;
+			}
+		}
+
+		.nav-action-btn:hover {
+			background: rgba(0, 0, 0, 0.15);
 		}
 	}
 </style>
