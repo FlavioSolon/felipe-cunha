@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	export let src: string;
 	export let caption: string = '';
@@ -12,6 +12,13 @@
 	function onLoad() {
 		loaded = true;
 	}
+
+	// Cached images don't fire on:load — check .complete after mount
+	onMount(() => {
+		if (imgEl && imgEl.complete) {
+			loaded = true;
+		}
+	});
 </script>
 
 <figure class="image-block layout-{layout}" style="--rotation: {rotation}deg">

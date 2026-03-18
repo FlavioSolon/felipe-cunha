@@ -248,6 +248,13 @@
 		min-height: calc(100vh - 60px);
 	}
 
+	/* On desktop, push all content right of the fixed AppNav sidebar (≈80px) */
+	@media (min-width: 850px) {
+		.page-wrapper {
+			padding-left: 80px;
+		}
+	}
+
 	/* ---------- Left panel: envelope list ---------- */
 	.filing-panel {
 		background: rgba(220, 210, 190, 0.4);
