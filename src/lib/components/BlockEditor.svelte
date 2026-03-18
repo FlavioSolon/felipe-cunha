@@ -232,7 +232,7 @@
 						<!-- Emoji quick access -->
 						<div class="text-tools">
 							<button
-								class="tool-btn emoji-btn"
+								class="tool-btn emoji-btn desktop-only"
 								on:mousedown|preventDefault
 								on:click={() => (showEmojiAt = showEmojiAt === i ? -1 : i)}
 								title="Inserir emoji"
@@ -719,5 +719,11 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+	}
+
+	@media (max-width: 860px) {
+		.desktop-only {
+			display: none !important;
+		}
 	}
 </style>
