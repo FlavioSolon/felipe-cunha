@@ -500,27 +500,29 @@
 					<div class="cartas-grid">
 						{#each allCartas as carta (carta.id)}
 							<article class="carta-row" transition:fly={{ y: 20 }}>
-								<div class="carta-row-thumb">
-									{#if carta.images?.[0]}
-										<img src={carta.images[0]} alt={carta.title} loading="lazy" />
-									{:else}
-										<div class="thumb-placeholder">✉</div>
-									{/if}
-								</div>
-								<div class="carta-row-info">
-									<div class="carta-row-meta">
-										<span class="meta-date">{formatDate(carta.date_sent)}</span>
-										{#if carta.location}
-											<span class="meta-loc">📍 {carta.location}</span>
+								<div class="carta-row-info-wrap">
+									<div class="carta-row-thumb">
+										{#if carta.images?.[0]}
+											<img src={carta.images[0]} alt={carta.title} loading="lazy" />
+										{:else}
+											<div class="thumb-placeholder">✉</div>
 										{/if}
 									</div>
-									<h3 class="carta-row-title">{carta.title}</h3>
-									{#if carta.excerpt}
-										<p class="carta-row-excerpt">{carta.excerpt.substring(0, 100)}...</p>
-									{/if}
-									<div class="carta-row-stats">
-										<span>❤️ {carta.likes ?? 0}</span>
-										<span>🖼 {(carta.images ?? []).length} foto(s)</span>
+									<div class="carta-row-info">
+										<div class="carta-row-meta">
+											<span class="meta-date">{formatDate(carta.date_sent)}</span>
+											{#if carta.location}
+												<span class="meta-loc">📍 {carta.location}</span>
+											{/if}
+										</div>
+										<h3 class="carta-row-title">{carta.title}</h3>
+										{#if carta.excerpt}
+											<p class="carta-row-excerpt">{carta.excerpt.substring(0, 100)}...</p>
+										{/if}
+										<div class="carta-row-stats">
+											<span>❤️ {carta.likes ?? 0}</span>
+											<span>🖼 {(carta.images ?? []).length} foto(s)</span>
+										</div>
 									</div>
 								</div>
 								<div class="carta-row-actions">
@@ -1171,6 +1173,11 @@
 		color: #e53e3e;
 	}
 
+	/* On desktop, info-wrap just passes through — mobile overrides below */
+	.carta-row-info-wrap {
+		display: contents;
+	}
+
 	/* Empty state */
 	.empty-state {
 		text-align: center;
@@ -1269,19 +1276,118 @@
 		opacity: 0.6;
 	}
 
-	/* Mobile */
+	/* ===== MOBILE ===== */
 	@media (max-width: 860px) {
+		/* Compose: single column, hide preview, sticky submit */
 		.compose-grid {
 			grid-template-columns: 1fr;
 		}
 		.compose-preview {
-			position: static;
+			display: none; /* preview only useful on desktop */
+		}
+		.compose-view {
+			padding: 1rem;
+		}
+		.form-card {
+			padding: 1rem;
+			border-radius: 14px;
 		}
 		.field-row {
 			grid-template-columns: 1fr;
+			gap: 0.75rem;
+		}
+		.form-actions {
+			position: sticky;
+			bottom: 0;
+			background: #fff;
+			margin: 0 -1rem -1rem;
+			padding: 0.75rem 1rem;
+			border-top: 1px solid #e8eaed;
+			border-radius: 0 0 14px 14px;
+			display: flex;
+			gap: 0.75rem;
+		}
+		.form-actions .btn-primary-action {
+			flex: 1;
+			justify-content: center;
+			font-size: 1rem;
+			padding: 0.85rem;
+		}
+
+		/* Top bar: tighter on mobile */
+		.top-bar-inner {
+			padding: 0.6rem 1rem;
+		}
+		.top-bar-title {
+			font-size: 0.95rem;
+		}
+		.btn-ghost {
+			padding: 0.45rem 0.75rem;
+			font-size: 0.8rem;
+		}
+		.btn-compose {
+			font-size: 0.85rem;
+			padding: 0.5rem 0.9rem;
+		}
+
+		/* List view: proper card layout */
+		.list-view {
+			padding: 0.75rem;
+		}
+		.cartas-grid {
+			gap: 0.75rem;
+		}
+		.carta-row {
+			flex-direction: column;
+			padding: 0.85rem;
+			gap: 0.75rem;
+		}
+		/* Horizontal header row: thumb + meta/title */
+		.carta-row-thumb {
+			width: 64px;
+			height: 64px;
+			border-radius: 8px;
+		}
+		/* Put thumb + text side by side */
+		.carta-row-info-wrap {
+			display: flex;
+			align-items: flex-start;
+			gap: 0.75rem;
+			width: 100%;
+		}
+		.carta-row-info {
+			flex: 1;
+			min-width: 0;
+		}
+		.carta-row-title {
+			font-size: 0.95rem;
+			white-space: normal;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
 		}
 		.carta-row-excerpt {
 			display: none;
+		}
+		/* Actions full-width bottom row */
+		.carta-row-actions {
+			width: 100%;
+			display: flex;
+			justify-content: flex-end;
+			gap: 0.5rem;
+			padding-top: 0.5rem;
+			border-top: 1px solid #f0f2f5;
+		}
+		.action-icon-btn {
+			width: 42px;
+			height: 42px;
+			border-radius: 10px;
+		}
+		.action-icon-btn svg {
+			width: 18px;
+			height: 18px;
 		}
 	}
 </style>

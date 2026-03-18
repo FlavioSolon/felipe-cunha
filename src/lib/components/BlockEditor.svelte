@@ -524,14 +524,37 @@
 		background: #fff;
 		border: 1px solid #e8eaed;
 		border-radius: 10px;
-		padding: 0.4rem;
+		padding: 0.5rem;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 3px;
+		gap: 4px;
 		width: 220px;
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 		z-index: 50;
 	}
+
+	/* On mobile: full-width fixed bottom sheet */
+	@media (max-width: 860px) {
+		.emoji-picker {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			width: 100%;
+			border-radius: 16px 16px 0 0;
+			padding: 1rem;
+			gap: 6px;
+			box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+			z-index: 200;
+			justify-content: center;
+		}
+		.emoji-option {
+			width: 44px !important;
+			height: 44px !important;
+			font-size: 1.5rem !important;
+		}
+	}
+
 	.emoji-option {
 		width: 30px;
 		height: 30px;
