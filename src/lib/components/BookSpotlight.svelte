@@ -81,6 +81,45 @@
 				<button onclick={copyPix} class="btn btn-secondary"> Ofertar via Pix </button>
 			</div>
 
+			<div class="cartas-cta" use:reveal>
+				<a href="/cartas" class="btn-cartas">
+					<div class="cartas-cta-icon">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 001.183 1.981l6.478 3.488m8.839 2.51l-4.66-2.51m0 0l-1.023-.55a2.25 2.25 0 00-2.134 0l-1.022.55m0 0l-4.661 2.51m16.5 1.615a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V8.844a2.25 2.25 0 011.183-1.981l7.5-4.039a2.25 2.25 0 012.134 0l7.5 4.039a2.25 2.25 0 011.183 1.98V19.5z"
+							/>
+						</svg>
+					</div>
+					<div class="cartas-cta-text">
+						<span class="cartas-cta-label">Do campo para você</span>
+						<span class="cartas-cta-title">Cartas do Campo</span>
+						<span class="cartas-cta-sub">Relatos das missões enviados direto do sertão</span>
+					</div>
+					<svg
+						class="cartas-cta-arrow"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="2"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+						/>
+					</svg>
+				</a>
+			</div>
+
 			{#if pixFeedback}
 				<div class="toast" transition:fly={{ y: 20 }}>
 					{pixFeedback}
@@ -165,6 +204,102 @@
 		display: flex;
 		gap: 1rem;
 		flex-wrap: wrap;
+	}
+
+	.cartas-cta {
+		margin-top: 1.8rem;
+	}
+
+	.btn-cartas {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 1.1rem 1.4rem;
+		background: linear-gradient(135deg, #fdf6e3 0%, #f5ead0 100%);
+		border: 2px solid rgba(139, 90, 43, 0.25);
+		border-radius: 14px;
+		text-decoration: none;
+		color: #5d3c1e;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 14px rgba(139, 90, 43, 0.1);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.btn-cartas::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(135deg, rgba(139, 90, 43, 0.06), transparent);
+		opacity: 0;
+		transition: opacity 0.3s;
+	}
+
+	.btn-cartas:hover {
+		border-color: rgba(139, 90, 43, 0.5);
+		box-shadow: 0 8px 24px rgba(139, 90, 43, 0.18);
+		transform: translateY(-2px);
+	}
+
+	.btn-cartas:hover::before {
+		opacity: 1;
+	}
+
+	.cartas-cta-icon {
+		width: 44px;
+		height: 44px;
+		background: rgba(139, 90, 43, 0.12);
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.cartas-cta-icon svg {
+		width: 22px;
+		height: 22px;
+		color: #8b5a2b;
+	}
+
+	.cartas-cta-text {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		flex: 1;
+	}
+
+	.cartas-cta-label {
+		font-size: 0.68rem;
+		text-transform: uppercase;
+		letter-spacing: 1.5px;
+		color: rgba(93, 60, 30, 0.6);
+		font-weight: 600;
+	}
+
+	.cartas-cta-title {
+		font-family: 'Merriweather', serif;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #3b2c1e;
+	}
+
+	.cartas-cta-sub {
+		font-size: 0.75rem;
+		color: rgba(93, 60, 30, 0.7);
+		line-height: 1.4;
+	}
+
+	.cartas-cta-arrow {
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+		color: #8b5a2b;
+		transition: transform 0.2s;
+	}
+
+	.btn-cartas:hover .cartas-cta-arrow {
+		transform: translateX(4px);
 	}
 
 	.toast {

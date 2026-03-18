@@ -4,6 +4,7 @@
 	import { fade, slide, fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
+	import AdminNav from '$lib/components/AdminNav.svelte';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
 	import { toasts } from '$lib/stores/toastStore';
 	import { resizeAndCropImage } from '$lib/imageResize';
@@ -397,6 +398,7 @@
 			</div>
 		</section>
 	{:else}
+		<AdminNav />
 		<header class="admin-header glass">
 			<div class="header-content">
 				<h2>Dashboard</h2>
@@ -784,6 +786,51 @@
 		padding: 2rem 1rem;
 		display: grid;
 		gap: 3rem;
+	}
+
+	/* Cartas shortcut */
+	.cartas-shortcut-banner {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		background: #fff;
+		border: 2px solid rgba(139, 90, 43, 0.2);
+		border-radius: 16px;
+		padding: 1.25rem 1.5rem;
+		text-decoration: none;
+		color: #3b2c1e;
+		transition: all 0.25s;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+	}
+	.cartas-shortcut-banner:hover {
+		border-color: rgba(139, 90, 43, 0.5);
+		box-shadow: 0 6px 20px rgba(139, 90, 43, 0.15);
+		transform: translateY(-1px);
+	}
+	.shortcut-icon {
+		font-size: 2rem;
+		flex-shrink: 0;
+	}
+	.cartas-shortcut-banner div {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+	}
+	.shortcut-title {
+		font-weight: 700;
+		font-size: 1rem;
+		color: #3b2c1e;
+	}
+	.shortcut-sub {
+		font-size: 0.8rem;
+		color: #888;
+	}
+	.shortcut-arrow {
+		font-size: 1.2rem;
+		color: #8b5a2b;
+		flex-shrink: 0;
+		font-weight: 600;
 	}
 
 	/* Editor Section */

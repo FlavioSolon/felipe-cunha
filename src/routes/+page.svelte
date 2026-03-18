@@ -9,6 +9,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import Divider from '$lib/components/Divider.svelte';
 	import FloatingSocials from '$lib/components/FloatingSocials.svelte';
+	import AppNav from '$lib/components/AppNav.svelte';
 	import { reveal } from '$lib/actions/reveal';
 
 	let scrollY = $state(0);
@@ -46,6 +47,7 @@
 
 <main>
 	<FloatingSocials />
+	<AppNav />
 	<Hero {scrollY} />
 
 	<About />
