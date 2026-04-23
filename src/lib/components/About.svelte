@@ -26,7 +26,7 @@
 			</div>
 			<div class="prose" use:reveal>
 				<p class="lead">
-					Felipe Cunha é pastor e missionário há uma década. Natural de Santa Catarina, é casado com
+					Felipe Cunha é missionário há uma década. Natural de Santa Catarina, é casado com
 					Tamyres Stuart e pai de Noah e Esther.
 				</p>
 				<p>
